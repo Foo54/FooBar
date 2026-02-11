@@ -1,0 +1,31 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1
+
+# Create menace logic
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if self.seal == 'Red' then'''
+position = 'at'
+payload = '''if self.seal == 'Red' or (self.seal == 'Purple' and SMODS.find_card('j_foobar_menace')[1]) then'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''elseif self.seal == 'Gold' and not self.ability.extra_enhancement then
+        ret = ret +  3'''
+position = 'at'
+payload = '''elseif (self.seal == 'Gold' or (self.seal == 'Purple' and SMODS.find_card('j_foobar_menace')[1])) and not self.ability.extra_enhancement then
+	ret = ret + 3'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if self.seal == 'Blue' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not self.ability.extra_enhancement then'''
+position = 'at'
+payload = '''if (self.seal == 'Blue' or (self.seal == 'Purple' and SMODS.find_card('j_foobar_menace')[1])) and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not self.ability.extra_enhancement then'''
+match_indent = true
