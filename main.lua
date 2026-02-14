@@ -8,6 +8,7 @@
 --- VERSION: 1.0.0
 --- BADGE_COLOR: 222222
 
+if not FooBar then FooBar = {} end
 
 --- file loading taken from Cryptid
 local mod_path = "" .. SMODS.current_mod.path
@@ -18,6 +19,6 @@ for _, file in ipairs(files) do
 	if err then
 		error(err)
 	end
-	return f()
+	f()
 end
 

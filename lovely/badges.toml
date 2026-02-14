@@ -1,0 +1,21 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 9999999
+
+# Create custom pools badges
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''if obj and obj.set_badges and type(obj.set_badges) == 'function' then'''
+position = 'before'
+payload = '''
+if obj and obj.pools and FooBar.badge_data then
+	for short, data in pairs(FooBar.badge_data) do
+		if obj.pools[short] then
+			badges[#badges + 1] = create_badge(data.name, data.color)
+		end
+	end
+end
+'''
+match_indent = true
