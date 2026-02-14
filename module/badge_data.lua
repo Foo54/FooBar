@@ -11,6 +11,10 @@ FooBar.badge_data = {
 		name = "Music Producer",
 		color = HEX("23d3d2")
 	},
+	Tanger = {
+		name = "Tanger",
+		color = HEX("FF7F27")
+	},
 	Song = {
 		name = "Song",
 		color = HEX("d3d332")
