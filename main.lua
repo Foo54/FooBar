@@ -12,6 +12,14 @@ if not FooBar then FooBar = {} end
 
 --- file loading taken from Cryptid
 local mod_path = "" .. SMODS.current_mod.path
+
+print("Foobar | Loading utils.lua")
+local f, err = SMODS.load_file("utils.lua")
+if err then
+	error(err)
+end
+f()
+
 local files = NFS.getDirectoryItems(mod_path .. "module")
 for _, file in ipairs(files) do
 	print("FooBar | Loading module file " .. file)
