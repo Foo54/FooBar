@@ -22,5 +22,9 @@ FooBar.badge_data = {
 	MonochroMenace = {
 		name = "MonochroMenace",
 		color = HEX("472047")
+	},
+	N25 = {
+		name = "Nightcord at 25:00",
+		color = HEX("8888cc")
 	}
 }
