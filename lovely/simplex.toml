@@ -1,0 +1,13 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -1
+
+# Make sure information is displayed properly
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if self.ability.effect == "Lucky Card" then'''
+position = 'at'
+payload = '''if self.ability.effect == "Lucky Card" and not FooBar.average_probability() then'''
+match_indent = true

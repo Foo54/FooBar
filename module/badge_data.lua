@@ -11,6 +11,10 @@ FooBar.badge_data = {
 		name = "Music Producer",
 		color = HEX("23d3d2")
 	},
+	Tanger = {
+		name = "Tanger",
+		color = HEX("FF7F27")
+	},
 	Song = {
 		name = "Song",
 		color = HEX("d3d332")
@@ -18,5 +22,9 @@ FooBar.badge_data = {
 	MonochroMenace = {
 		name = "MonochroMenace",
 		color = HEX("472047")
+	},
+	N25 = {
+		name = "Nightcord at 25:00",
+		color = HEX("8888cc")
 	}
 }
