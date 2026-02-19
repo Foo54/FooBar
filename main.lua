@@ -30,3 +30,14 @@ for _, file in ipairs(files) do
 	f()
 end
 
+SMODS.current_mod.calculate = function(self, context)
+	if context.modify_shop_card then
+		if context.card.config.center.key == "j_foobar_graphics_card" then
+			G.GAME.foobar_inflation = (G.GAME.foobar_inflation or 0) + 1
+		end
+	end
+end
+
+SMODS.current_mod.description_loc_vars = function()
+    return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.2 }
+end
