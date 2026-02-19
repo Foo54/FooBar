@@ -1,30 +1,5 @@
 --- Contains all mod jokers
 
-SMODS.Joker{
-	key = "fryer",
-	atlas = "jokers",
-	pos = {x=2,y=1},
-	config = {
-		extra = {
-			money = 1
-		}
-	},
-	cost = 6,
-	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.money}}
-	end,
-	calculate = function(self, card, context)
-		if context.before then
-			if #G.hand.cards > 0 then
-				SMODS.destroy_cards(G.hand.cards[#G.hand.cards], nil, nil, nil)
-				return {
-					dollars = card.ability.extra.money
-				}
-			end
-		end
-	end
-}
-
 --- Hatsune Miku
 SMODS.Joker{
 	key = "hatsunemikun25",
@@ -64,7 +39,10 @@ SMODS.Joker{
 	},
 	cost = 6,
 	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.scale, card.ability.extra.mult}}
+		return {
+			key = next(SMODS.find_card("j_foobar_hatsunemikun25")) and "j_foobar_mizukiakiyama_miku" or nil,
+			vars = {card.ability.extra.scale, card.ability.extra.mult}
+		}
 	end,
 	calculate = function(self, card, context)
 		if context.setting_ability and not context.blueprint then
@@ -102,9 +80,12 @@ SMODS.Joker{
 	},
 	loc_vars = function(self, info_queue, card)
 		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.numerator, card.ability.extra.denominator, "foobar_ena")
-		ret = {vars = {num, dem, card.ability.immutable.count + 1}}
+		ret = {key = "j_foobar_enashinonome", vars = {num, dem, card.ability.immutable.count + 1}}
 		if FooBar.average_probability() then
-			ret.key = "j_foobar_enashinonome_simplex"
+			ret.key = ret.key .. "_simplex"
+		end
+		if next(SMODS.find_card("j_foobar_hatsunemikun25")) then
+			ret.key = ret.key .. "_miku"
 		end
 		return ret
 	end,
@@ -154,7 +135,10 @@ SMODS.Joker{
 	},
 	cost = 6,
 	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.chips, card.ability.extra.loss}}
+		return {
+			key = next(SMODS.find_card("j_foobar_hatsunemikun25")) and "j_foobar_mafuyuasahina_miku" or nil,
+			vars = {card.ability.extra.chips, card.ability.extra.loss}
+		}
 	end,
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
@@ -192,7 +176,10 @@ SMODS.Joker{
 		}
 	},
 	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.inc, card.ability.extra.chips}}
+		return {
+			key = next(SMODS.find_card("j_foobar_hatsunemikun25")) and "j_foobar_kanadeyoisaki_miku" or nil,
+			vars = {card.ability.extra.inc, card.ability.extra.chips}
+		}
 	end,
 	calculate = function(self, card, context)
 		if context.setting_blind and not context.blueprint then
@@ -226,6 +213,32 @@ SMODS.Joker{
 	end
 }
 
+--- Fryer
+SMODS.Joker{
+	key = "fryer",
+	atlas = "jokers",
+	pos = {x=2,y=1},
+	config = {
+		extra = {
+			money = 1
+		}
+	},
+	cost = 6,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money}}
+	end,
+	calculate = function(self, card, context)
+		if context.before then
+			if #G.hand.cards > 0 then
+				SMODS.destroy_cards(G.hand.cards[#G.hand.cards], nil, nil, nil)
+				return {
+					dollars = card.ability.extra.money
+				}
+			end
+		end
+	end
+}
+
 --- Simplex
 SMODS.Joker{
 	key = "simplex",
@@ -235,14 +248,28 @@ SMODS.Joker{
 	cost = 8
 }
 
-if false then
 --- Graphics Card
 SMODS.Joker{
 	key = "graphicscard",
 	atlas = "jokers",
-	pos = {x=1, y=1}
+	pos = {x=1, y=1},
+	config = {
+		extra = {
+			scale = 2
+		}
+	},
+	cost = 4,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.scale, card.sell_cost * card.ability.extra.scale}}
+	end,
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				mult = card.sell_cost * card.ability.extra.scale
+			}
+		end
+	end,
 }
-end
 
 --- Nothing
 SMODS.Joker{

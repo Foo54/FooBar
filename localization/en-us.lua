@@ -94,7 +94,33 @@ return {
 					"{C:inactive}[Currently {C:chips}+#2#{C:inactive} chips]"
 				}
 			},
+			j_foobar_kanadeyoisaki_miku = {
+				name = "Kanade Yoisaki",
+				text = {
+					"Gains {C:chips}+#1#{} chips",
+					"When {C:attention}blind{} is selected",
+					"{C:inactive}[Currently {C:chips}+#2#{C:inactive} chips]"
+				}
+			},
 			j_foobar_enashinonome = {
+				name = "Ena Shinonome",
+				text = {
+					"Rerolling has a",
+					"{C:green}#1# in #2# chance",
+					"to create a {C:tarot}tarot{} card",
+					"{C:inactive}(Must have room)"
+				}
+			},
+			j_foobar_enashinonome_simplex = {
+				name = "Ena Shinonome",
+				text = {
+					"The first {C:green}#1# of every #2#{} {C:attention}rerolls",
+					"create a {C:tarot}tarot{} card",
+					"{C:inactive}[Currently reroll {C:attention}#3#{C:inactive}]",
+					"{C:inactive}(Must have room)"
+				}
+			},
+			j_foobar_enashinonome_miku = {
 				name = "Ena Shinonome",
 				text = {
 					"Rerolling has a",
@@ -102,7 +128,7 @@ return {
 					"to create a {C:tarot}tarot{} card"
 				}
 			},
-			j_foobar_enashinonome_simplex = {
+			j_foobar_enashinonome_simplex_miku = {
 				name = "Ena Shinonome",
 				text = {
 					"The first {C:green}#1# of every #2#{} {C:attention}rerolls",
@@ -118,12 +144,26 @@ return {
 					"Cards with {C:chips}0{} base chips are {C:red}destroyed"
 				} --- credits to Kusanehexaku for this idea
 			},
+			j_foobar_mafuyuasahina_miku = {
+				name = "Mafuyu Asahina",
+				text = {
+					"Scored cards give {C:chips}+#1#{} chips"
+				}
+			},
 			j_foobar_mizukiakiyama = {
 				name = "Mizuki Akiyama",
 				text = {
 					"Gains {X:mult,C:white}X#1#{} when",
 					"cards change {C:attention}enhancements",
 					"Card must already have an {C:attention}enhancement",
+					"{C:inactive}[Currently {X:mult,C:white}X#2#{C:inactive} Mult]"
+				}
+			},
+			j_foobar_mizukiakiyama_miku = {
+				name = "Mizuki Akiyama",
+				text = {
+					"Gains {X:mult,C:white}X#1#{} when",
+					"cards change {C:attention}enhancements",
 					"{C:inactive}[Currently {X:mult,C:white}X#2#{C:inactive} Mult]"
 				}
 			},
@@ -240,6 +280,21 @@ return {
 					"{C:red}destroy{} right-most card",
 					"held in hand and earn {C:money}$#1#"
 				}
+			},
+			j_foobar_graphicscard = {
+				name = "Graphics Card",
+				text = {
+					{
+						"{C:mult}+#1#{} mult per",
+						"{C:money}${} of this card's",
+						"sell value",
+						"{C:inactive}[Currently {C:mult}+#2#{C:inactive} Mult]"
+					},
+					{
+						"This card's {C:money}price{} doubles",
+						"Every time it appears in shop"
+					}
+				}
 			}
 		},
 		Enhanced = {
@@ -270,6 +325,34 @@ return {
 					"{C:dark_edition}Polychrome{} edition",
 					"to a random {C:attention}Joker",
 					"{C:inactive}[Currently on use {C:attention}#3#{C:inactive}]"
+				}
+			},
+			c_foobar_dingus = {
+				name = "The Dingus",
+				text = {
+					"Randomize {C:attention}suit{} and {C:attention}rank{}",
+					"of up to {C:attention}#1#{} selected cards"
+				}
+			}
+		},
+		Mod = {
+			foobar = {
+				name = "Credits",
+				text = {
+					"Additional concept:",
+					"{C:hearts,s:1}Kusanehexaku{C:inactive,s:1}",
+					"{C:hearts,s:1}Tetocord{C:inactive,s:1}",
+					"{C:clubs,s:1}Balatro Discord{C:inactive,s:1}",
+					"{C:hearts,s:1}Glatcord{C:inactive,s:1}",
+					"{C:diamonds,s:1}Tancord{C:inactive,s:1}",
+					"{C:tarot,s:1}Monocord{C:inactive,s:1}",
+					" ",
+					"Programming help:",
+					"{C:hearts,s:1}Balatro Discord{C:inactive,s:1}",
+					" ",
+					"Special thanks:",
+					"SIMPLEX ALGORITHM",
+					"{s:1}Rin0k038 - 'No.'",
 				}
 			}
 		}
