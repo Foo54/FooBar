@@ -295,6 +295,23 @@ return {
 						"Every time it appears in shop"
 					}
 				}
+			},
+			j_foobar_baguette = {
+				name = "Baguette",
+				text = {
+					"Played {C:attention}face cards{}",
+					"Earn {C:money}$#1#{} when scored",
+					"Lasts for {C:red}#2#{} rounds"
+				}
+			},
+			j_foobar_nic = {
+				name = "nic",
+				text = {
+					"nic",
+					"",
+					"{s:0.7,C:inactive}Earn {s:0.7,C:money}$#1#{s:0.7,C:inactive} at end of round",
+					"{s:0.5,C:inactive}And something else..."
+				}
 			}
 		},
 		Enhanced = {
@@ -353,6 +370,36 @@ return {
 					"Special thanks:",
 					"SIMPLEX ALGORITHM",
 					"{s:1}Rin0k038 - 'No.'",
+					"{s:1}Zeurunix",
+					"{s:1}Its Star! - 'space reasons'",
+				}
+			}
+		},
+		Back = {
+			b_foobar_bargain = {
+				name = "Bargain Deck",
+				text = {
+					"All items in shop cost {C:money}$#1#",
+					"Blinds give {C:red}no{} rewards",
+					"Earn {C:red}no{} interest"
+				}
+			}
+		},
+		Sleeve = {
+			sleeve_foobar_bargain = {
+				name = "Bargain Sleeve",
+				text = {
+					"All items in shop cost {C:money}$#1#",
+					"Blinds give {C:red}no{} rewards",
+					"Earn {C:red}no{} interest"
+				}
+			},
+			sleeve_foobar_bargain_stacked = {
+				name = "Bargain Sleeve",
+				text = {
+					"Start run with the",
+					"{C:green,T:v_reroll_surplus}#1#{} and",
+					"{C:green,T:v_reroll_glut}#2#{} vouchers",
 				}
 			}
 		}

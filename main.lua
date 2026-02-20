@@ -4,8 +4,8 @@
 --- PREFIX: foobar
 --- MOD_AUTHOR: [Foo54]
 --- MOD_DESCRIPTION: Foo54's own creation where I put random ideas I have in it.
---- LOADER_VERSION_GEQ: 1.0.0
---- VERSION: 1.0.0
+--- LOADER_VERSION_GEQ: 0.4dev
+--- VERSION: 0.4dev
 --- BADGE_COLOR: 222222
 
 if not FooBar then FooBar = {} end

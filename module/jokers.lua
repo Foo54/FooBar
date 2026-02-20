@@ -1,5 +1,7 @@
 --- Contains all mod jokers
 
+--- Page One
+
 --- Hatsune Miku
 SMODS.Joker{
 	key = "hatsunemikun25",
@@ -37,6 +39,7 @@ SMODS.Joker{
 			mult = 1
 		}
 	},
+	rarity = 2,
 	cost = 6,
 	loc_vars = function(self, info_queue, card)
 		return {
@@ -223,6 +226,7 @@ SMODS.Joker{
 			money = 1
 		}
 	},
+	rarity = 2,
 	cost = 6,
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.money}}
@@ -567,3 +571,90 @@ SMODS.Joker{
 	end
 }
 
+--- Page Two
+
+--- baguette
+SMODS.Joker{
+	key = "baguette",
+	atlas = "jokers",
+	pos = {x=3, y=1},
+	config = {
+		extra = {
+			money = 1
+		},
+		immutable = {
+			rounds = 4
+		}
+	},
+	cost = 4,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money, card.ability.immutable.rounds}}
+	end,
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card:is_face() then
+				return {
+					dollars = card.ability.extra.money
+				}
+			end
+		end
+		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+			card.ability.immutable.rounds = card.ability.immutable.rounds - 1
+			if card.ability.immutable.rounds == 0 then
+				SMODS.destroy_cards(card, nil, nil, nil)
+				return {
+					message = localize('k_eaten_ex'),
+					colour = G.C.RED
+				}
+			else
+				return {
+					message = "nom!",
+					colour = G.C.YELLOW,
+					func = function(...)
+						G.E_MANAGER:add_event(Event({
+							func = function()
+								self:set_sprites(card, card.config.center)
+								return true
+							end
+						}))
+					end
+				}
+			end
+		end
+	end,
+	set_sprites = function(self, card, front)
+		if card.ability and card.ability.immutable and card.ability.immutable.rounds > 0 then
+			card.children.center:set_sprite_pos({x = 3 + 4 - card.ability.immutable.rounds, y = 1})
+		end
+	end
+}
+
+--- nic
+SMODS.Joker{
+	key = "nic",
+	atlas = "jokers",
+	pos = {x=7,y=1},
+	config = {
+		extra = {
+			money = 67
+		}
+	},
+	rarity = 4,
+	pools = {["nic"] = true},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money}}
+	end,
+	calculate = function(self, card, context)
+		if context.joker_main then
+			if G.GAME.dollars + (G.GAME.dollar_buffer or 0) == 67 then
+				return {
+					chips = G.GAME.blind.chips,
+					message = "nic"
+				}
+			end
+		end
+	end,
+	calc_dollar_bonus = function(self, card)
+		return card.ability.extra.money
+	end
+}
