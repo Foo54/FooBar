@@ -4,7 +4,7 @@
 --- PREFIX: foobar
 --- MOD_AUTHOR: [Foo54]
 --- MOD_DESCRIPTION: Foo54's own creation where I put random ideas I have in it.
---- LOADER_VERSION_GEQ: 0.4dev
+--- LOADER_VERSION_GEQ: 0.5dev
 --- VERSION: 0.5dev
 --- BADGE_COLOR: 222222
 
@@ -42,3 +42,4 @@ SMODS.current_mod.description_loc_vars = function()
     return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.2 }
 
 end
+
