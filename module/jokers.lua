@@ -10,6 +10,7 @@ SMODS.Joker{
 	pools = {["N25"] = true},
 	rarity = 3,
 	cost = 8,
+	blueprint_compat = false,
 	in_pool = function(self, args)
 		for i, card in ipairs(G.jokers.cards) do
 			if FooBar.safe_get(card.config.center, "pools", "N25") then return true end
@@ -168,7 +169,8 @@ SMODS.Joker{
 	atlas = "jokers",
 	pos = {x=10,y=0},
 	pools = {["N25"] = true},
-	cost = 4,
+	cost = 6,
+	rarity = 2,
 	config = {
 		extra = {
 			inc = 25,
@@ -228,11 +230,12 @@ SMODS.Joker{
 	},
 	rarity = 2,
 	cost = 6,
+	blueprint_compat = false,
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.money}}
 	end,
 	calculate = function(self, card, context)
-		if context.before then
+		if context.before and not context.blueprint then
 			if #G.hand.cards > 0 then
 				SMODS.destroy_cards(G.hand.cards[#G.hand.cards], nil, nil, nil)
 				return {
@@ -249,7 +252,8 @@ SMODS.Joker{
 	atlas = "jokers",
 	pos = {x=0,y=1},
 	rarity = 2,
-	cost = 8
+	cost = 8,
+	blueprint_compat = false
 }
 
 --- Graphics Card
@@ -439,7 +443,7 @@ SMODS.Joker{
 				xmult = card.ability.extra.mult
 			}
 		end
-		if context.final_scoring_step and G.GAME.blind and SMODS.last_hand_oneshot then
+		if context.final_scoring_step and G.GAME.blind and SMODS.last_hand_oneshot and not context.blueprint then
 			card.ability.extra.timer = card.ability.extra.timer - 1
 			if card.ability.extra.timer <= 0 then
 				return {
@@ -587,6 +591,7 @@ SMODS.Joker{
 		}
 	},
 	cost = 4,
+	eternal_compat = false,
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.money, card.ability.immutable.rounds}}
 	end,
@@ -640,7 +645,7 @@ SMODS.Joker{
 		}
 	},
 	rarity = 4,
-	pools = {["nic"] = true},
+	pools = {["nic"] = true, ["Producer"] = true},
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.money}}
 	end,

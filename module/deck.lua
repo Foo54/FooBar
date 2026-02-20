@@ -1,9 +1,6 @@
 SMODS.Back({
 	key = "bargain",
-	config = {no_interest = true, vouchers = {
-		"v_clearance_sale",
-		"v_liquidation"
-	}},
+	config = {no_interest = true},
 	atlas = "decks",
 	pos = { x = 0, y = 0 },
 	loc_vars = function(self, info_queue, card)
