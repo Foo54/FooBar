@@ -26,5 +26,9 @@ FooBar.badge_data = {
 	N25 = {
 		name = "Nightcord at 25:00",
 		color = HEX("8888cc")
+	},
+	nic = {
+		name = "nic",
+		color = HEX("1dbeeb")
 	}
 }
