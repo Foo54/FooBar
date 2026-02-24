@@ -271,6 +271,9 @@ SMODS.Joker{
 		return {vars = {card.ability.extra.scale, card.sell_cost * card.ability.extra.scale}}
 	end,
 	calculate = function(self, card, context)
+		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+			G.GAME.foobar_inflation = (G.GAME.foobar_inflation or 0) + 1
+		end
 		if context.joker_main then
 			return {
 				mult = card.sell_cost * card.ability.extra.scale

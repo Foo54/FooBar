@@ -30,12 +30,12 @@ local card_get_suit_ref = Card.is_suit
 function Card.is_suit (self, suit, bypass_debuff, flush_calc)
 	local ret = card_get_suit_ref(self, suit, bypass_debuff, flush_calc)
 	if ret then return ret end
-  if G.GAME.foobar_adaptive then
-	for blind, _ in pairs(G.GAME.foobar_adaptive.clearedBlinds.suit) do
-		ret = ret or FooBar.adaptive.registeredBlinds[blind].callback(self, suit, bypass_debuff, flush_calc)
-		if ret then return ret end
+	if G.GAME.foobar_adaptive then
+		for blind, _ in pairs(G.GAME.foobar_adaptive.clearedBlinds.suit) do
+			ret = ret or FooBar.adaptive.registeredBlinds[blind].callback(self, suit, bypass_debuff, flush_calc)
+			if ret then return ret end
+		end
 	end
-  end
 	return ret
 end
 
@@ -291,7 +291,7 @@ FooBar.registerAdaptiveEffect(
 )
 
 FooBar.registerAdaptiveEffect(
-	"bl_face",
+	"bl_plant",
 	"calculate",
 	function (self, back, context)
 		if context.individual and context.other_card:is_face() then
@@ -497,7 +497,6 @@ SMODS.Back{
 			clearedBlinds = {
 				calculate = {},
 				suit = {},
-				modifier = {},
 				draw = {},
 				onetime = {}
 			}
@@ -505,7 +504,7 @@ SMODS.Back{
 	end,
 	calculate = function (self, back, context)
 		if context.end_of_round and context.main_eval and context.beat_boss then
-			if not G.GAME.blind.disabled then
+			if not G.GAME.blind.disabled or G.GAME.blind.config.blind.key == "bl_final_leaf" then
 				local state, msg = pcall(function()
 					local key = G.GAME.blind.config.blind.key
 					local type = FooBar.adaptive.registeredBlinds[key].type
