@@ -644,6 +644,7 @@ SMODS.Joker{
 			money = 67
 		}
 	},
+	cost = 25,
 	rarity = 4,
 	pools = {["nic"] = true, ["Producer"] = true},
 	loc_vars = function(self, info_queue, card)
@@ -663,3 +664,141 @@ SMODS.Joker{
 		return card.ability.extra.money
 	end
 }
+
+--- Le fish au chocolat
+SMODS.Joker{
+	key = "lefisheauchocolat",
+	atlas = "jokers",
+	pos = {x=8,y=1},
+	cost = 7,
+	rarity = 2,
+	config = {
+		extra = {
+			num = 1,
+			dem = 7,
+			mult = 7
+		},
+		immutable = {
+			counter = 1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		local key = self.key
+		if FooBar.average_probability() then key = key .. "_simplex" end
+		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "foobar_lefishauchocolat")
+		return {key = key, vars = {num, dem, card.ability.extra.mult}}
+	end,
+	calculate = function(self, card, context)
+		if context.stay_flipped and not context.blueprint then
+			if context.from_area == G.deck and context.to_area == G.hand then
+				local flag = false
+				if FooBar.average_probability() then --- REALY LAGGY: FIX THIS
+					local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "foobar_lefishauchocolat")
+					card.ability.immutable.count = (card.ability.immutable.count + 1) % dem
+					flag = card.ability.immutable.count < num
+				else
+					flag = SMODS.pseudorandom_probability(card, "foobar_lefishauchocolat", card.ability.extra.num, card.ability.extra.dem)
+				end
+				if flag then
+					return {
+						stay_flipped = true
+					}
+				end
+			end
+			if context.from_area == G.hand and (context.to_area == G.play or context.to_area == "unscored") then
+				return {
+					stay_flipped = true
+				}
+			end
+		end
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.facing == "back" then
+				return {
+					mult = card.ability.extra.mult
+				}
+			end
+		end
+		if context.check_enhancement and context.cardarea ~= G.deck and not context.blueprint then
+			if context.other_card.facing == "back" then
+				return {
+					m_wild = true
+				}
+			end
+		end
+	end
+}
+
+--- Adachi Rei
+SMODS.Joker{
+	key = "adachirei",
+	atlas = "jokers",
+	pos = {x=9,y=1},
+	config = {
+		extra = {
+			cmult = 30,
+			chips = 0
+		}
+	},
+	cost = 4,
+	loc_vars = function(self, info_queue, card)
+		return {
+			main_start = {
+				{ n = G.UIT.T, config = { text = ' +', colour = G.C.CHIPS, scale = 0.32 } },
+				{
+					n = G.UIT.O,
+					config = {
+						object = DynaText({
+							string = {
+								{prefix = "", ref_table = card.ability.extra, ref_value = "chips"}
+							},
+							colours = { G.C.CHIPS },
+							bump = true,
+							pop_in_rate = 999999,
+							silent = true,
+							pop_delay = 0.1,
+							scale = 0.32,
+							min_cycle_time = 0.1
+						})
+					}
+				},
+				{ n = G.UIT.T, config = { text = ' chips', colour = G.C.CHIPS, scale = 0.32 } },
+			},
+			vars = {card.ability.extra.cmult}
+		}
+	end,
+	update = function(self, card, dt)
+		card.ability.extra.chips = math.floor(card.ability.extra.cmult * math.sin(love.timer.getTime())) + card.ability.extra.cmult
+	end,
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				chips = card.ability.extra.chips
+			}
+		end
+	end
+}
+
+
+if false then
+--- Retry Now
+SMODS.Joker{
+	key = "retrynow",
+	atlas = "jokers",
+	pos = {x=10,y=1},
+	config = {
+		extra = {
+			scaling = 2,
+			req = 0.5
+		}
+	},
+	rarity = 3,
+	cost = 9,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.scaling, math.floor(card.ability.extra.req * 100)}}
+	end
+	--- TODO: implement
+}
+end
+
+
+

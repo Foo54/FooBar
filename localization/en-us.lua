@@ -54,20 +54,6 @@ return {
 					}
 				}
 			},
-			j_foobar_retrynow = {
-				name = "Retry Now",
-				text = {
-					{
-						"Gives {X:mult,C:white}X#1#{} mult"
-					},
-					{
-						"Prevents Death if chips scored",
-						"are at least {C:attention}#1#%{} of required chips",
-						'{C:red,E:2}self destructs{}, but will appear in the next shop',
-						"at {C:red}double{} the cost and stats"
-					}
-				}
-			},
 			j_foobar_lostmedia = {
 				name = "Lost Media",
 				text = {
@@ -154,8 +140,8 @@ return {
 				name = "Mizuki Akiyama",
 				text = {
 					"Gains {X:mult,C:white}X#1#{} when",
-					"cards change {C:attention}enhancements",
-					"Card must already have an {C:attention}enhancement",
+					"cards change {C:enhanced}enhancements",
+					"Card must already have an {C:enhanced}enhancement",
 					"{C:inactive}[Currently {X:mult,C:white}X#2#{C:inactive} Mult]"
 				}
 			},
@@ -312,6 +298,59 @@ return {
 					"{s:0.7,C:inactive}Earn {s:0.7,C:money}$#1#{s:0.7,C:inactive} at end of round",
 					"{s:0.5,C:inactive}And something else..."
 				}
+			},
+			j_foobar_lefisheauchocolat = {
+				name = "Le Fishe au chocolat",
+				text = {
+					{
+						"Cards have a {C:green}#1# in #2#{} chance",
+						"To be drawn {C:attention}face down{}",
+						"{C:attention}Face down{} cards are treated as {C:enhanced}wild{} cards",
+						"and give {C:mult}+#3#{} mult when scored"
+					},
+					{
+						"{C:red}Due to SMODS issues, this will induce",
+						"{C:red}significant lag"
+					}
+				}
+			},
+			j_foobar_lefisheauchocolat_simplex = {
+				name = "Le Fishe au chocolat",
+				text = {
+					{
+						"{C:green}#1# of every #2#{} cards",
+						"are drawn {C:attention}face down{}",
+						"{C:attention}Face down{} cards are treated as {C:enhanced}wild{} cards",
+						"and give {C:mult}+#3#{} mult when scored"
+					},
+					{
+						"{C:red}Due to SMODS issues, this will induce",
+						"{C:red}significant lag"
+					}
+				}
+			},
+			j_foobar_adachirei = {
+				name = "Adachi Rei",
+				text = {
+					"{s:0.7}+#1# * sin(time) + #1# chips",
+					"{C:inactive,s:0.7}WHAT DO YOU MEAN YOU RECREATED THE HUMAN VOICE WITH SINE WAVES"
+				}
+			},
+			j_foobar_retrynow = {
+				name = "Retry Now",
+				text = {
+					{
+						"Blind size {X:attention}X#1#",
+						"Gain your current {C:attention}hands",
+						"on {C:attention}blind{} select"
+					},
+					{
+						"Win blind if at least {C:attention}#2#%",
+						"of required chips are {C:attention}scored",
+						"Blind scaling becomes {C:red}permanent",
+						"{C:red,E:2}self destructs{}"
+					}
+				}
 			}
 		},
 		Enhanced = {
@@ -350,6 +389,14 @@ return {
 					"Randomize {C:attention}suit{} and {C:attention}rank{}",
 					"of up to {C:attention}#1#{} selected cards"
 				}
+			},
+			c_foobar_robot = {
+				name = "The Robot",
+				text = {
+					"Create {C:attention}#2#{} copies of {C:attention}#1#{} selected card",
+					"The {C:attention}first{} copy will have randomized {C:attention}suit",
+					"The {C:attention}second{} copy will have randomized {C:attention}rank"
+				}
 			}
 		},
 		Mod = {
@@ -366,6 +413,7 @@ return {
 					" ",
 					"Programming help:",
 					"{C:hearts,s:1}Balatro Discord{C:inactive,s:1}",
+					"{C:edition,s:1}LasagnaFelidae",
 					" ",
 					"Special thanks:",
 					"SIMPLEX ALGORITHM",
@@ -382,6 +430,14 @@ return {
 					"All items in shop cost {C:money}$#1#",
 					"Blinds give {C:red}no{} rewards",
 					"Earn {C:red}no{} interest"
+				}
+			},
+			b_foobar_adaptive = {
+				name = "Adaptive Deck",
+				text = {
+					"When defeating an enabled boss blind",
+					"for the first time this run,",
+					"gain a permanent ability"
 				}
 			}
 		},
@@ -400,6 +456,209 @@ return {
 					"Start run with the",
 					"{C:green,T:v_reroll_surplus}#1#{} and",
 					"{C:green,T:v_reroll_glut}#2#{} vouchers",
+				}
+			},
+			sleeve_foobar_adaptive = {
+				name = "Adaptive Sleeve",
+				text = {
+					"When defeating an enabled boss blind",
+					"for the first time this run,",
+					"gain a permanent ability"
+				}
+			},
+			sleeve_foobar_adaptive_stacked = {
+				name = "Adaptive Sleeve",
+				text = {
+					"Start run with the",
+					"{C:green,T:v_retcon}#1#{} and",
+					"{C:green,T:v_directors_cut}#2#{} vouchers",
+				}
+			}
+		},
+		Spectral = {
+			c_foobar_sudormrf = {
+				name = "sudo rm -rf /",
+				text = {
+					"Destroys {C:red}all{} cards in {C:attention}deck,",
+					"a random joker,",
+					"and a random card held in hand"
+				}
+			}
+		},
+		Other = {
+			ba_bl_hook = {
+				text = {
+					"Retrigger {C:attention}2{} random cards",
+					"held in hand"
+				}
+			},
+			ba_bl_ox = {
+				text = {
+					"Playing your {C:attention}most played hand{}",
+					"Earns {C:money}$5"
+				}
+			},
+			ba_bl_house = {
+				text = {
+					"Retrigger {C:attention}all cards",
+					"in first played hand"
+				}
+			},
+			ba_bl_wall = {
+				text = {
+					"{X:mult,C:white}X2{} mult"
+				}
+			},
+			ba_bl_wheel = {
+				text = {
+					"{C:green}1 in 7{} chance to",
+					"retrigger cards",
+					"{C:inactive,s:0.7}This is affected by cards such as oops and simplex"
+				}
+			},
+			ba_bl_arm = {
+				text = {
+					"{C:green}Increase{} level of",
+					"played {C:attention}poker hand"
+				}
+			},
+			ba_bl_club = {
+				text = {
+					"All {C:attention}suits{} are",
+					"treated as {C:clubs}clubs"
+				}
+			},
+			ba_bl_fish = {
+				text = {
+					"Retrigger {C:attention}all{} cards",
+					"{C:attention}not{} in starting hand"
+				}
+			},
+			ba_bl_psychic = {
+				text = {
+					"Return all {C:attention}played cards",
+					"to hand if {C:attention}5{} cards",
+					"were played"
+				}
+			},
+			ba_bl_goad = {
+				text = {
+					"All {C:attention}suits{} are",
+					"treated as {C:spades}spades"
+				}
+			},
+			ba_bl_water = {
+				text = {
+					"Gain the number of discards",
+					"you lost while playing",
+					"this blind permanently"
+				}
+			},
+			ba_bl_window = {
+				text = {
+					"All {C:attention}suits{} are",
+					"treated as {C:diamonds}diamonds"
+				}
+			},
+			ba_bl_manacle = {
+				text = {
+					"+1 hand size"
+				}
+			},
+			ba_bl_eye = {
+				text = {
+					"Retrigger {C:attention}all{} played cards",
+					"while only {C:attention}one{} hand type",
+					"has been scored",
+					"this {C:attention}round"
+				}
+			},
+			ba_bl_mouth = {
+				text = {
+					"Retrigger {C:attention}all{} played cards",
+					"while no {C:attention}hand{} types",
+					"have been scored twice",
+					"this {C:attention}round"
+				}
+			},
+			ba_bl_plant = {
+				text = {
+					"All {C:attention}face{} cards",
+					"give {X:mult,C:white}X1.25{} mult"
+				}
+			},
+			ba_bl_serpent = {
+				text = {
+					"Always draw",
+					"at least {C:attention}3{} cards"
+				}
+			},
+			ba_bl_pillar = {
+				text = {
+					"Prioritize drawing cards",
+					"that have already been",
+					"{C:attention}played{} this ante"
+				}
+			},
+			ba_bl_needle = {
+				text = {
+					"Gain the number of hands",
+					"you lost while playing",
+					"this blind {C:attention}permanently"
+				}
+			},
+			ba_bl_head = {
+				text = {
+					"All {C:attention}suits{} are",
+					"treated as {C:heart}heart"
+				}
+			},
+			ba_bl_tooth = {
+				text = {
+					"Earn {C:money}$1{} per",
+					"card played"
+				}
+			},
+			ba_bl_flint = {
+				text = {
+					"Base {C:chips}chips{} and",
+					"{C:mult}mult{} are doubled"
+				}
+			},
+			ba_bl_mark = {
+				text = {
+					"Retrigger all",
+					"{C:attention}face{} cards"
+				}
+			},
+			ba_bl_final_acorn = {
+				text = {
+					"I have no clue what this should do",
+					"lmk if you got any ideas",
+					"discord @foo54"
+				}
+			},
+			ba_bl_final_leaf = {
+				text = {
+					"{C:dark_edition}+1{} joker slot"
+				}
+			},
+			ba_bl_final_vessel = {
+				text = {
+					"{X:mult,C:white}X3{} mult"
+				}
+			},
+			ba_bl_final_heart = {
+				text = {
+					"Before scoring, select a {C:attention}random{} joker",
+					"this joker will also be {C:attention}treated{} as a {C:blue}blueprint{}"
+				}
+			},
+			ba_bl_final_bell = {
+				text = {
+					"After drawing cards,",
+					"modify {C:attention}one{} random card",
+					"{C:attention}held{} in hand"
 				}
 			}
 		}

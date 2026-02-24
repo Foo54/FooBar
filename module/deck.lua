@@ -11,6 +11,8 @@ SMODS.Back({
 		G.GAME.modifiers.no_blind_reward.Small = true
 		G.GAME.modifiers.no_blind_reward.Big = true
 		G.GAME.modifiers.no_blind_reward.Boss = true
+		G.GAME.banned_keys['v_clearance_sale'] = true
+		G.GAME.banned_keys['v_liquidation'] = true
 		G.GAME.backup_discount_percent = G.GAME.backup_discount_percent or G.GAME.discount_percent
 		G.GAME.discount_percent = 100
 	end

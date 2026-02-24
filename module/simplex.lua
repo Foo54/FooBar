@@ -1,3 +1,4 @@
+---@diagnostic disable: redundant-parameter
 local DEF_PROB = "foobar_default_probability"
 
 --- 8 Ball
@@ -48,7 +49,6 @@ SMODS.Joker:take_ownership("gros_michel", {
 				message = localize('k_safe_ex')
 			}
 		end
----@diagnostic disable-next-line: redundant-parameter
 		return grosrefcalc(self, card, context)
 	end,
 	loc_vars = function(self, local_queue, card)
@@ -109,7 +109,6 @@ SMODS.Joker:take_ownership("cavendish", {
 				message = localize('k_safe_ex')
 			}
 		end
----@diagnostic disable-next-line: redundant-parameter
 		return cavrefcalc(self, card, context)
 	end,
 	loc_vars = function(self, local_queue, card)
@@ -120,7 +119,6 @@ SMODS.Joker:take_ownership("cavendish", {
 				vars = {card.ability.extra.Xmult, dem - (card.ability.foobar_counter or 0), num}
 			}
 		end
----@diagnostic disable-next-line: redundant-parameter
 		return cavreflocvars(self, local_queue, card)
 	end
 }, true)
