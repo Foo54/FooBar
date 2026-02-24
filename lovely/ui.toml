@@ -1,0 +1,67 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# insert my own UI into the deck
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''function G.UIDEF.deck_info(_show_remaining)
+  return create_UIBox_generic_options({contents ={create_tabs(
+    {tabs = _show_remaining and {
+        {
+          label = localize('b_remaining'),
+          chosen = true,
+          tab_definition_function = G.UIDEF.view_deck,
+          tab_definition_function_args = true,
+        },
+        {
+            label = localize('b_full_deck'),
+            tab_definition_function = G.UIDEF.view_deck
+        },
+    } or {
+      {
+        label = localize('b_full_deck'),
+        chosen = true,
+        tab_definition_function = G.UIDEF.view_deck
+      },
+    },
+    tab_h = 8,
+    snap_to_nav = true})}})
+end'''
+position = 'at'
+payload = '''function G.UIDEF.deck_info(_show_remaining)
+	local tabs = {
+		tabs = _show_remaining and {
+        {
+          label = localize('b_remaining'),
+          chosen = true,
+          tab_definition_function = G.UIDEF.view_deck,
+          tab_definition_function_args = true,
+        },
+        {
+            label = localize('b_full_deck'),
+            tab_definition_function = G.UIDEF.view_deck
+        },
+    } or {
+      {
+        label = localize('b_full_deck'),
+        chosen = true,
+        tab_definition_function = G.UIDEF.view_deck
+      },
+    },
+    tab_h = 8,
+    snap_to_nav = true
+	}
+	if G.GAME.foobar_adaptive then
+		tabs.tabs[#tabs.tabs + 1] = {
+			label = "Bonuses",
+			tab_definition_function = G.UIDEF.foobar_view_bonuses
+		}
+	end
+  return create_UIBox_generic_options({contents ={create_tabs(tabs)}})
+end'''
+match_indent = true
+
+

@@ -1,6 +1,7 @@
 {
 	"Lua.diagnostics.globals": [
 		"SMODS",
+		"FooBar",
 		"G",
 		"Card",
 		"localize",
@@ -10,6 +11,13 @@
 		"delay",
 		"pseudorandom_element",
 		"pseudoseed",
-		"CardSleeves"
-	]
+		"CardSleeves",
+		"DynaText",
+		"love",
+		"NFS",
+		"check_for_unlock",
+		"attention_text",
+		"mix_colors"
+	],
+	"Lua.workspace.library": ["C:/Users/foo54/AppData/Roaming/Balatro/Mods/smods-1.0.0-beta-1224a", "C:/Users/foo54/AppData/Roaming/Balatro/Mods/lovely/dump"]
 }
