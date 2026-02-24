@@ -30,10 +30,12 @@ local card_get_suit_ref = Card.is_suit
 function Card.is_suit (self, suit, bypass_debuff, flush_calc)
 	local ret = card_get_suit_ref(self, suit, bypass_debuff, flush_calc)
 	if ret then return ret end
+  if G.GAME.foobar_adaptive then
 	for blind, _ in pairs(G.GAME.foobar_adaptive.clearedBlinds.suit) do
 		ret = ret or FooBar.adaptive.registeredBlinds[blind].callback(self, suit, bypass_debuff, flush_calc)
 		if ret then return ret end
 	end
+  end
 	return ret
 end
 
@@ -502,7 +504,7 @@ SMODS.Back{
 		}
 	end,
 	calculate = function (self, back, context)
-		if context.end_of_round and context.game_over == false and context.main_eval and context.beat_boss then
+		if context.end_of_round and context.main_eval and context.beat_boss then
 			if not G.GAME.blind.disabled then
 				local state, msg = pcall(function()
 					local key = G.GAME.blind.config.blind.key
