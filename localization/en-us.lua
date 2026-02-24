@@ -277,8 +277,8 @@ return {
 						"{C:inactive}[Currently {C:mult}+#2#{C:inactive} Mult]"
 					},
 					{
-						"This card's {C:money}price{} doubles",
-						"Every time it appears in shop"
+						"Future occurances of this card's {C:money}price{} doubles",
+						"at the end of round"
 					}
 				}
 			},
@@ -663,4 +663,5 @@ return {
 			}
 		}
 	}
+
 }
