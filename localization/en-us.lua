@@ -655,13 +655,5 @@ return {
 			}
 		}
 	}
+
 }
-
---[[
-
-voucher
-If wheel of fortunes fail
-1 in 10 chance to give
-Negative edition
-
-]]--
