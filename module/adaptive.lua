@@ -524,10 +524,12 @@ SMODS.Back{
 			end
 		end
 		local ret = {}
-		for blind, _ in pairs(G.GAME.foobar_adaptive.clearedBlinds.calculate) do
-			ret[#ret + 1] = FooBar.adaptive.registeredBlinds[blind].callback(self, back, context)
+		if G.GAME.foobar_adaptive then
+			for blind, _ in pairs(G.GAME.foobar_adaptive.clearedBlinds.calculate) do
+				ret[#ret + 1] = FooBar.adaptive.registeredBlinds[blind].callback(self, back, context)
+			end
+			return SMODS.merge_effects(ret)
 		end
-		return SMODS.merge_effects(ret)
 	end
 }
 

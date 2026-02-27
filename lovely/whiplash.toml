@@ -1,0 +1,24 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -10000
+
+# Store reference to original card in ui copy
+[[patches]]
+[patches.pattern]
+target = '=[SMODS _ "src/overrides.lua"]'
+pattern = '''local copy = copy_card(SUITS[visible_suit[j]][i], nil, _scale)
+					copy.greyed = greyed'''
+position = 'after'
+payload = '''if unplayed_only then copy.foobar_reference = SUITS[visible_suit[j]][i] end'''
+match_indent = true
+
+# Cartomancer compatability
+[[patches]]
+[patches.pattern]
+target = '=[SMODS _ "src/overrides.lua"]'
+pattern = '''local copy = BALIATRO and copy_card(v, nil, _scale, nil, nil, true)
+	                  or copy_card(v, nil, _scale)'''
+position = 'after'
+payload = '''if unplayed_only then copy.foobar_reference = v end'''
+match_indent = true
