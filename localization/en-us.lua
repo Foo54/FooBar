@@ -160,22 +160,6 @@ return {
 					"{V:1}Nightcord at 25:00{} cards"
 				}
 			},
-			j_foobar_true = {
-				name = "True",
-				text = {
-					"{X:mult,C:white}X#1#{} mult if", --# x3
-					"cards played {C:attention}bitwise &'d{} together",
-					"is greater than {C:attention}#2#{}" -- 0
-				}
-			},
-			j_foobar_false = {
-				name = "False",
-				text = {
-					"{X:mult,C:white}X#1#{} mult if",
-					"cards played {C:attention}bitwise &'d{} together",
-					"are {C:attention}#2#{}"
-				}
-			},
 			j_foobar_simplex = {
 				name = "Simplex Algorithm",
 				text = {
@@ -336,20 +320,28 @@ return {
 					"{C:inactive,s:0.7}WHAT DO YOU MEAN YOU RECREATED THE HUMAN VOICE WITH SINE WAVES"
 				}
 			},
-			j_foobar_retrynow = {
-				name = "Retry Now",
+			j_foobar_whiplash = {
+				name = "Whiplash",
 				text = {
-					{
-						"Blind size {X:attention}X#1#",
-						"Gain your current {C:attention}hands",
-						"on {C:attention}blind{} select"
-					},
-					{
-						"Win blind if at least {C:attention}#2#%",
-						"of required chips are {C:attention}scored",
-						"Blind scaling becomes {C:red}permanent",
-						"{C:red,E:2}self destructs{}"
-					}
+					"Once per blind",
+					"{C:attention}click{} on a card in your {C:attention}deck{}",
+					"to draw it to hand",
+					"{C:attention}#2#{} hand size",
+					"{C:inactive}#1#!{}"
+				}
+			},
+			j_foobar_mitosis = {
+				name = "Mitosis",
+				text = {
+					"Fixed {C:green}#1# in #2#{} chance",
+					"to duplicate used {C:attention}consumable"
+				}
+			},
+			j_foobar_mitosis_simplex = {
+				name = "Mitosis",
+				text = {
+					"Duplicate every other",
+					"used {C:attention}consumable"
 				}
 			}
 		},
@@ -477,7 +469,7 @@ return {
 		},
 		Spectral = {
 			c_foobar_sudormrf = {
-				name = "sudo rm -rf /",
+				name = "sudo rm -rf / --no-preserve-root",
 				text = {
 					"Destroys {C:red}all{} cards in {C:attention}deck,",
 					"a random joker,",

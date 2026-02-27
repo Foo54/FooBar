@@ -66,5 +66,11 @@ CardSleeves.Sleeve{
 ---@diagnostic disable-next-line: missing-parameter
 			SMODS.Back:get_obj("b_foobar_adaptive").apply(self)
 		end
+	end,
+	calculate = function(self, card, context)
+		if self.get_current_deck_key() ~= "b_foobar_adaptive" then
+---@diagnostic disable-next-line: missing-parameter
+			return SMODS.Back:get_obj("b_foobar_adaptive").calculate(self, card, context)
+		end
 	end
 }

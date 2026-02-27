@@ -781,27 +781,89 @@ SMODS.Joker{
 	end
 }
 
-
-if false then
---- Retry Now
+--- Whiplash
 SMODS.Joker{
-	key = "retrynow",
+	key = "whiplash",
 	atlas = "jokers",
 	pos = {x=10,y=1},
 	config = {
 		extra = {
-			scaling = 2,
-			req = 0.5
+			handsize_loss = 2
+		},
+		immutable = {
+			active = false
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.immutable.active and "Active" or "Inactive", -card.ability.extra.handsize_loss}}
+	end,
+	rarity = 2,
+	cost = 7,
+	add_to_deck = function(self, card, from_debuff)
+			G.hand:change_size(-card.ability.extra.handsize_loss)
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+			G.hand:change_size(card.ability.extra.handsize_loss)
+	end,
+	calculate = function(self, card, context)
+		if context.setting_blind and not context.blueprint then
+			card.ability.immutable.active = true
+			juice_card_until(card, function() return not G.RESET_JIGGLES and card.ability.immutable.active end, true)
+		end
+	end
+}
+
+--- Mitosis
+SMODS.Joker{
+	key = "mitosis",
+	atlas = "jokers",
+	pos = {x=11,y=1},
+	config = {
+		immutable = {
+			num = 1,
+			dem = 2,
+			state = true
 		}
 	},
 	rarity = 3,
 	cost = 9,
 	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.scaling, math.floor(card.ability.extra.req * 100)}}
+		return {
+			key = self.key .. (FooBar.average_probability() and "_simplex" or ""),
+			vars = {card.ability.immutable.num, card.ability.immutable.dem}
+		}
+	end,
+	blueprint_compat = false,
+	calculate = function(self, card, context)
+		if not context.blueprint and context.using_consumeable then
+			local flag = false
+			if FooBar.average_probability() then
+---@diagnostic disable-next-line: cast-local-type
+				flag = card.ability.immutable.state
+				card.ability.immutable.state = not card.ability.immutable.state
+			else
+				flag = pseudorandom("mitosis_duplicate", 0, 1) < 0.5
+			end
+			if flag then
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						local copied_card = copy_card(context.consumeable, nil)
+						copied_card:add_to_deck()
+						G.consumeables:emplace(copied_card)
+						return true
+					end
+				}))
+				return {
+					message = "Duplicated!"
+				}
+			end
+			return {
+				message = "Nope!"
+			}
+		end
 	end
-	--- TODO: implement
 }
-end
+
 
 
 
