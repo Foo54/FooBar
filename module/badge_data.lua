@@ -30,5 +30,9 @@ FooBar.badge_data = {
 	nic = {
 		name = "nic",
 		color = HEX("1dbeeb")
+	},
+	aiko = {
+		name = "AikoShen Crossmod",
+		color = HEX("ff475a")
 	}
 }

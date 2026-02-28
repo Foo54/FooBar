@@ -4,8 +4,8 @@
 --- PREFIX: foobar
 --- MOD_AUTHOR: [Foo54]
 --- MOD_DESCRIPTION: Foo54's own creation where I put random ideas I have in it.
---- LOADER_VERSION_GEQ: 0.7dev
---- VERSION: 0.7dev
+--- LOADER_VERSION_GEQ: 0.8dev
+--- VERSION: 0.8dev
 --- BADGE_COLOR: 222222
 
 if not FooBar then FooBar = {} end
@@ -23,7 +23,7 @@ SMODS.current_mod.optional_features = function()
 end
 
 print("Foobar | Loading utils.lua")
-local f, err = SMODS.load_file("utils.lua")
+local f, err = SMODS.load_file("module/priority/utils.lua")
 if err then
 	error(err)
 end
@@ -31,21 +31,22 @@ f()
 
 local files = NFS.getDirectoryItems(mod_path .. "module")
 for _, file in ipairs(files) do
-	print("FooBar | Loading module file " .. file)
-	local f, err = SMODS.load_file("module/" .. file)
-	if err then
-		error(err)
+	if file:match(".lua$") then
+		print("FooBar | Loading module file " .. file)
+		local f, err = SMODS.load_file("module/" .. file)
+		if err then
+			error(err)
+		end
+		f()
 	end
-	f()
 end
 
-SMODS.current_mod.calculate = function(self, context)
-	if context.modify_shop_card then
-		if context.card.config.center.key == "j_foobar_graphics_card" then
-			G.GAME.foobar_inflation = (G.GAME.foobar_inflation or 0) + 1
-		end
-	end
+print("Foobar | Loading crossmod.lua")
+local f, err = SMODS.load_file("module/priority/crossmod.lua")
+if err then
+	error(err)
 end
+f()
 
 SMODS.current_mod.description_loc_vars = function()
     return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.2 }

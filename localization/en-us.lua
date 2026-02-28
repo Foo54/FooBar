@@ -343,6 +343,21 @@ return {
 					"Duplicate every other",
 					"used {C:attention}consumable"
 				}
+			},
+			j_foobar_splitdance = {
+				name = "Split Dance",
+				text = {
+					"Sliced cards calculate",
+					"effects a {C:attention}third{} time"
+				}
+			},
+			j_foobar_cigarette = {
+				name = "Cigarette",
+				text = {
+					"If played hand one shots the blind",
+					"{C:red}Destroy{} {C:attention}#2#{} card in deck",
+					"{C:red}-#1#{} hand size"
+				}
 			}
 		},
 		Enhanced = {
@@ -404,8 +419,9 @@ return {
 					"{C:tarot,s:1}Monocord{C:inactive,s:1}",
 					" ",
 					"Programming help:",
-					"{C:hearts,s:1}Balatro Discord{C:inactive,s:1}",
+					"{C:hearts,s:1}Balatro Discord",
 					"{C:edition,s:1}LasagnaFelidae",
+					"{s:1}TheOneGoofAli",
 					" ",
 					"Special thanks:",
 					"SIMPLEX ALGORITHM",
@@ -655,5 +671,13 @@ return {
 			}
 		}
 	}
-
 }
+
+--[[
+
+voucher
+If wheel of fortunes fail
+1 in 10 chance to give
+Negative edition
+
+]]--
