@@ -178,7 +178,7 @@ FooBar.registerAdaptiveEffect(
 	function (self, back, context)
 		if context.before then
 			if not G.GAME.foobar_adaptive.blindExtra.bl_psychic then G.GAME.foobar_adaptive.blindExtra.bl_psychic = {} end
-			G.GAME.foobar_adaptive.blindExtra.bl_psychic.ret = #context.scoring_hand == 5
+			G.GAME.foobar_adaptive.blindExtra.bl_psychic.ret = context.full_hand == 5
 		end
 	end
 )

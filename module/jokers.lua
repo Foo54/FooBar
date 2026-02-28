@@ -864,6 +864,38 @@ SMODS.Joker{
 	end
 }
 
-
+--- Cigarette
+SMODS.Joker{
+	key = "cigarette",
+	atlas = "jokers",
+	pos = {x=0, y=2},
+	rarity=3,
+	cost=6,
+	config = {
+		extra = {
+			hand_size = 2,
+			destroyed = 1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.hand_size, card.ability.extra.destroyed}}
+	end,
+	calculate = function(self, card, context)
+		if context.last_hand_oneshot and context.main_eval and context.end_of_round then
+			for i = 1, card.ability.extra.destroyed do
+				local card = pseudorandom_element(G.deck.cards, "cigarette_lung_cancer")
+				if card then
+					SMODS.destroy_cards(card)
+				end
+			end
+		end
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		G.hand:change_size(-card.ability.extra.hand_size)
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		G.hand:change_size(card.ability.extra.hand_size)
+	end
+}
 
 
