@@ -358,6 +358,28 @@ return {
 					"{C:red}Destroy{} {C:attention}#2#{} card in deck",
 					"{C:red}-#1#{} hand size"
 				}
+			},
+			j_foobar_teto = {
+				name = "Kasane Teto",
+				text = {
+					"Played {C:attention}4's{} and {C:attention}aces",
+					"Give {X:chips,C:white}X#1#{} chips",
+					"when scored"
+				}
+			},
+			j_foobar_pearto = {
+				name = "Pearto",
+				text = {
+					{
+						"{C:green}#1# in #2#{} chance",
+						"to create {C:legendary}Kasane Teto",
+						"at {C:attention}end of round{}"
+					},
+					{
+						"{C:green}#3# in #4#{} chance",
+						"to {C:red}destroy{} self at {C:attention}end of round"
+					}
+				}
 			}
 		},
 		Enhanced = {

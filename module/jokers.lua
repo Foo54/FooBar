@@ -558,10 +558,9 @@ SMODS.Joker{
 	key = "welcomenewmember",
 	atlas = "jokers",
 	cost = 9,
-	rarity = 3,
 	config = {
 		extra = {
-			scaling = 67
+			scaling = 6.7
 		}
 	},
 	pos = {x = 0, y = 0},
@@ -721,7 +720,7 @@ SMODS.Joker{
 				}
 			end
 		end
-		if context.check_enhancement and context.cardarea ~= G.deck and not context.blueprint then
+		if context.check_enhancement and context.other_card.cardarea ~= G.deck and not context.blueprint then
 			if context.other_card.facing == "back" then
 				return {
 					m_wild = true
@@ -788,7 +787,7 @@ SMODS.Joker{
 	pos = {x=10,y=1},
 	config = {
 		extra = {
-			handsize_loss = 2
+			handsize_loss = 1
 		},
 		immutable = {
 			active = false
@@ -873,7 +872,7 @@ SMODS.Joker{
 	cost=6,
 	config = {
 		extra = {
-			hand_size = 2,
+			hand_size = 1,
 			destroyed = 1
 		}
 	},
@@ -898,4 +897,61 @@ SMODS.Joker{
 	end
 }
 
+--- Kasane Teto
+SMODS.Joker{
+	key = "teto",
+	atlas = "jokers",
+	pos = {x=1, y=2},
+	soul_pos = {x=2, y=2},
+	rarity = 4,
+	cost = 25,
+	config = {
+		extra = {
+			chips = 3.1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips}}
+	end,
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.is_suit("Hearts") or context.other_card:get_id() == 4 or context.other_card:get_id() == 14 then
+				return {
+					xchips = card.ability.extra.chips
+				}
+			end
+		end
+	end
+}
 
+--- Teto Pear
+SMODS.Joker{
+	key = "pearto",
+	atlas = "jokers",
+	pos = {x=3,y=2},
+	rarity = 2,
+	cost = 3,
+	config = {
+		extra = {
+			num = 1,
+			dem = 401,
+			destroy = 31
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.j_foobar_teto
+		local num1, dem1 = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "pearto")
+		local num2, dem2 = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.destroy, "pearto_consume")
+		return {vars = {num1, dem1, num2, dem2}}
+	end,
+	calculate = function(self, context, card)
+		if context.end_of_round and context.main_eval then
+			if SMODS.pseudorandom_probability(card, "pearto", card.ability.extra.num, card.ability.extra.dem) then
+				SMODS.add_card{key="j_foobar_teto"}
+			end
+			if SMODS.pseudorandom_probability(card, "perto_consume", card.ability.extra.num, card.ability.extra.destroy) then
+				SMODS.destroy_cards(card)
+			end
+		end
+	end
+}
