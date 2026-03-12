@@ -61,6 +61,19 @@ SMODS.Consumable{
 			delay = 0.2,
 			func = function()
 				G.hand:unhighlight_all()
+				play_sound("foobar_teto", 1, 1)
+				card:juice_up(0.3, 0.3)
+				attention_text({
+					text = "Teto!",
+					scale = 1.3,
+					hold = 1.4,
+					major = card,
+					backdrop_colour = G.C.RED,
+					align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED) and
+							'tm' or 'cm',
+					offset = { x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK or G.STATE == G.STATES.SMODS_BOOSTER_OPENED) and -0.2 or 0 },
+					silent = true
+				})
 				return true
 			end
 		}))

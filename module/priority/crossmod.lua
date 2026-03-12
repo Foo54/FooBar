@@ -1,3 +1,4 @@
+---@diagnostic disable: redundant-parameter
 -- Code from https://github.com/TheOneGoofAli/TOGAPackBalatro
 
 -- Out-of-the-Box crossmod content.

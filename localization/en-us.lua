@@ -380,6 +380,19 @@ return {
 						"to {C:red}destroy{} self at {C:attention}end of round"
 					}
 				}
+			},
+			j_foobar_companioncube = {
+				name = "Companion Cube",
+				text = {
+					"If it could talk -",
+					"and the Enrichment Center takes",
+					"this opportunity to remind you",
+					"that it cannot -",
+					"it would tell you to go on without",
+					"it becuase it would rather die",
+					"in a fire than become",
+					"a burden to you"
+				}
 			}
 		},
 		Enhanced = {
