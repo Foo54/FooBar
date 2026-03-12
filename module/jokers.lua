@@ -656,6 +656,7 @@ SMODS.Joker{
 		if context.joker_main then
 			if G.GAME.dollars + (G.GAME.dollar_buffer or 0) == 67 then
 				return {
+---@diagnostic disable-next-line: undefined-field
 					chips = G.GAME.blind.chips,
 					message = "nic"
 				}
@@ -953,5 +954,20 @@ SMODS.Joker{
 				SMODS.destroy_cards(card)
 			end
 		end
+	end
+}
+
+--- Companion Cube
+SMODS.Joker{
+	key = "companioncube",
+	atlas = "jokers",
+	pos = {x=4,y=2},
+	rarity = 3,
+	cost = 17,
+	add_to_deck = function(self, card, from_debuff)
+		G.jokers.config.card_limit = G.jokers.config.card_limit + 1
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		G.jokers.config.card_limit = G.jokers.config.card_limit - 1
 	end
 }
