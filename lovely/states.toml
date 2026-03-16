@@ -10,7 +10,7 @@ target = 'game.lua'
 pattern = '''DONT FIND THIS PLEASE THANK YOUif self.STATE == self.STATES.MENU then
             self:update_menu(dt)
         end'''
-position = 'fter'
+position = 'after'
 payload = '''if self.STATE == self.STATES.FOOBAR_MINIGAME then
 	self:update_foobar_minigame(dt)
 end'''
