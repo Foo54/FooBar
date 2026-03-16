@@ -8,5 +8,5 @@
 	"main_file": "main.lua",
 	"priority": 0,
 	"badge_colour": "222222",
-	"version": "0.11-dev"
+	"version": "0.11.1-dev"
 }
