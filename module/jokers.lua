@@ -916,7 +916,7 @@ SMODS.Joker{
 	end,
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			if context.other_card.is_suit("Hearts") or context.other_card:get_id() == 4 or context.other_card:get_id() == 14 then
+			if context.other_card:is_suit("Hearts") or context.other_card:get_id() == 4 or context.other_card:get_id() == 14 then
 				return {
 					xchips = card.ability.extra.chips
 				}
@@ -971,3 +971,42 @@ SMODS.Joker{
 		G.jokers.config.card_limit = G.jokers.config.card_limit - 1
 	end
 }
+
+--- Feedback
+SMODS.Joker{
+	key = "feedback",
+	atlas = "jokers",
+	pos = {x=5,y=2},
+	cost = 5,
+	config = {
+		extra = {
+			mult = 0,
+			scaling = 3
+		}
+	},
+	pools = {["Song"] = true, ["MonochroMenace"] = true},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.mult, card.ability.extra.scaling}}
+	end,
+	calculate = function(self, card, context)
+		if context.before and not context.blueprint then
+			local scaled = true
+			for key, value in ipairs(context.scoring_hand) do
+				if value:get_id() == 14 and value.base.suit == "Spades" and SMODS.has_enhancement(value, "m_wild") then
+					SMODS.scale_card(card, {
+						ref_table = card.ability.extra,
+						ref_value = "mult",
+						scalar_value = "scaling"
+					})
+					break
+				end
+			end
+		end
+		if context.joker_main then
+			return {
+				mult = card.ability.extra.mult
+			}
+		end
+	end
+}
+

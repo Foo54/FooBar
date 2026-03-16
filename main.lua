@@ -1,13 +1,3 @@
---- STEAMODDED HEADER
---- MOD_NAME: FooBar
---- MOD_ID: foobar
---- PREFIX: foobar
---- MOD_AUTHOR: [Foo54]
---- MOD_DESCRIPTION: Foo54's own creation where I put random ideas I have in it.
---- LOADER_VERSION_GEQ: 0.10dev
---- VERSION: 0.10dev
---- BADGE_COLOR: 222222
-
 if not FooBar then FooBar = {} end
 
 --- file loading taken from Cryptid
@@ -23,30 +13,32 @@ SMODS.current_mod.optional_features = function()
 end
 
 print("Foobar | Loading utils.lua")
-local f, err = SMODS.load_file("module/priority/utils.lua")
-if err then
-	error(err)
-end
-f()
+assert(SMODS.load_file("module/priority/utils.lua"))()
 
 local files = NFS.getDirectoryItems(mod_path .. "module")
 for _, file in ipairs(files) do
 	if file:match(".lua$") then
 		print("FooBar | Loading module file " .. file)
-		local f, err = SMODS.load_file("module/" .. file)
-		if err then
-			error(err)
-		end
-		f()
+		assert(SMODS.load_file("module/" .. file))()
 	end
 end
 
-print("Foobar | Loading crossmod.lua")
-local f, err = SMODS.load_file("module/priority/crossmod.lua")
-if err then
-	error(err)
+--[[
+don't do this yet
+print("Foobar | Loading minigame.lua")
+assert(SMODS.load_file("module/priority/minigame.lua"))()
+
+local files = NFS.getDirectoryItems(mod_path .. "module/minigame")
+for _, file in ipairs(files) do
+	if file:match(".lua$") then
+		print("FooBar | Loading minigame file " .. file)
+		assert(SMODS.load_file("module/minigame/" .. file))()
+	end
 end
-f()
+]]
+
+print("Foobar | Loading crossmod.lua")
+assert(SMODS.load_file("module/priority/crossmod.lua"))()
 
 SMODS.current_mod.description_loc_vars = function()
     return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.2 }
