@@ -1,0 +1,1 @@
+minigame class can be found in module/priority

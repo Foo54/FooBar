@@ -393,6 +393,15 @@ return {
 					"in a fire than become",
 					"a burden to you"
 				}
+			},
+			j_foobar_feedback = {
+				name = "FEEDBACK",
+				text = {
+					"This joker gains {C:mult}+#2#{} mult",
+					"if {C:attention}scored hand{} contains",
+					"a {C:attention}wild ace of spades{}",
+					"{C:inactive}[Currently {C:mult}+#1#{C:inactive} Mult]"
+				}
 			}
 		},
 		Enhanced = {
