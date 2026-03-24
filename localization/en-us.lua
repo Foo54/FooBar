@@ -469,9 +469,18 @@ return {
 					" ",
 					"Special thanks:",
 					"SIMPLEX ALGORITHM",
+					"{s:1}aikoyori",
+					" ",
+					"People who asked",
 					"{s:1}Rin0k038 - 'No.'",
 					"{s:1}Zeurunix",
 					"{s:1}Its Star! - 'space reasons'",
+					"{s:1}☆ lexi ☆",
+					"{s:1}John Balatro",
+
+					"Minesweeper quips:",
+					"{s:1}FirstTry, notmario, gabby, mys.minty, aure",
+					"{s:1}Kusane, Jade Penguin, kel"
 				}
 			}
 		},
@@ -534,6 +543,33 @@ return {
 					"Destroys {C:red}all{} cards in {C:attention}deck,",
 					"a random joker,",
 					"and a random card held in hand"
+				}
+			}
+		},
+		Tag = {
+			fbminigame_foobar_projectsekai = {
+				name = "Project Sekai",
+				text = {
+					"Beat a pjsk chart",
+					"{C:inactive,s:0.7}Around a Hard 20",
+					"to win {C:attention}4{} copies",
+					"of the above skip tag"
+				}
+			},
+			fbminigame_foobar_tetobaguettecatch = {
+				name = "Baguette Catch",
+				text = {
+					"Catch the falling baguettes",
+					"to win a minigame tag!"
+				}
+			},
+			fbminigame_foobar_minesweeper = {
+				name = "Minesweeper",
+				text = {
+					"Beat minesweeper",
+					"to make the",
+					"{C:attention}Emotional Support Card",
+					"{C:dark_edition}negative"
 				}
 			}
 		},

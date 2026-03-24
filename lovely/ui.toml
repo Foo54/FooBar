@@ -95,7 +95,7 @@ position = "after"
 payload = '''if _minigame and _tag_container then 
   _tag_container.children[3].config.draw_after = false
   _tag_container.children[3].config.colour = G.C.BLACK
-  _minigame.children[2].config.button = 'skip_blind'
+  _minigame.children[2].config.button = 'foobar_select_minigame'
   _minigame.config.outline_colour = adjust_alpha(G.C.BLUE, 0.5)
   _minigame.children[2].config.hover = true
   _minigame.children[2].config.colour = G.C.RED
@@ -150,4 +150,14 @@ payload = '''if _minigame and _tag_container then
   local _sprite = _minigame.config.ref_table
   _sprite.config.force_focus = true
 end'''
+match_indent = true
+
+
+# insert formatting for the minigame selection box
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''if (not self.OVERLAY_MENU) or (not self.F_HIDE_BG) then '''
+position = "at"
+payload = '''if ((not self.OVERLAY_MENU) or (not self.F_HIDE_BG)) and not (self.GAME and self.GAME.FOOBAR_MINIGAME) then '''
 match_indent = true

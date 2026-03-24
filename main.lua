@@ -23,8 +23,6 @@ for _, file in ipairs(files) do
 	end
 end
 
---[[
-don't do this yet
 print("Foobar | Loading minigame.lua")
 assert(SMODS.load_file("module/priority/minigame.lua"))()
 
@@ -35,7 +33,6 @@ for _, file in ipairs(files) do
 		assert(SMODS.load_file("module/minigame/" .. file))()
 	end
 end
-]]
 
 print("Foobar | Loading crossmod.lua")
 assert(SMODS.load_file("module/priority/crossmod.lua"))()
