@@ -1,7 +1,8 @@
+---@diagnostic disable: redundant-parameter
 --Utility function to check things without erroring | copied from cryptid
 ---@param t table
 ---@param ... any
----@return table|false
+---@return any
 function FooBar.safe_get(t, ...)
 	local current = t
 	for _, k in ipairs({ ... }) do
@@ -47,7 +48,7 @@ end
 -- Utility function for generating take_ownership calculate effects for jokers that do something every n triggers
 ---@param key string
 ---@param condition function
----@param num_table table|nil
+---@param num_table table
 ---@param dem_table table
 ---@param effect function
 ---@return function
@@ -69,7 +70,7 @@ end
 
 -- Utility function for generating loc_vars effects for jokers that do something every n triggers
 ---@param key string
----@param num_table table|nil
+---@param num_table table
 ---@param dem_table table
 ---@param loc_vars_key string
 ---@param loc_vars_table table|nil
@@ -81,6 +82,7 @@ function FooBar.generate_average_probability_nth_trigger_loc_vars (key, num_tabl
 			local num, dem = SMODS.get_probability_vars(card, FooBar.safe_get_table(card.ability, num_table) or 1, FooBar.safe_get_table(card.ability, dem_table) or 2, key)
 			local ret = {num, dem, (card.ability.foobar_counter or 0) + 1}
 			for i, v in ipairs(loc_vars_table or {}) do
+---@diagnostic disable-next-line: assign-type-mismatch, param-type-mismatch
 				ret[#ret + 1] = FooBar.safe_get_table(card.ability, loc_vars_table)
 			end
 			return {key = loc_vars_key, vars = ret}
@@ -93,12 +95,11 @@ end
 -- Utility function for calling take_ownership for jokers that do something every n triggers
 ---@param key string
 ---@param condition function
----@param num_table table|nil
+---@param num_table table
 ---@param dem_table table
 ---@param effect function
 ---@param loc_vars_key string
 ---@param loc_vars_table table|nil
----@return function
 function FooBar.take_ownership_nth_trigger (key, condition, num_table, dem_table, effect, loc_vars_key, loc_vars_table)
 	SMODS.Joker:take_ownership(key, {
 		calculate = FooBar.generate_average_probability_func_nth_trigger("j_" .. key, condition, num_table, dem_table, effect),
@@ -158,6 +159,7 @@ function FooBar.generate_average_probability_expected_value_loc_vars (key, num_t
 				ret[#ret + 1] = v
 			end
 			for i, v in ipairs(loc_vars_table or {}) do
+---@diagnostic disable-next-line: param-type-mismatch
 				ret[#ret + 1] = FooBar.safe_get_table(card.ability, loc_vars_table)
 			end
 			return {key = loc_vars_key, vars = ret}
@@ -175,7 +177,6 @@ end
 ---@param succeed table
 ---@param loc_vars_key string
 ---@param loc_vars_table table|nil
----@return function
 function FooBar.take_ownership_expected_value (key, condition, num_table, dem_table, fail, succeed, loc_vars_key, loc_vars_table)
 	SMODS.Joker:take_ownership(key, {
 		calculate = FooBar.generate_average_probability_func_expected_value("j_" .. key, condition, num_table, dem_table, fail, succeed),

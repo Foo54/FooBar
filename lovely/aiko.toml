@@ -1,0 +1,14 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = -10000
+
+# check for split dance when doing sliced retriggers
+[[patches]]
+[patches.pattern]
+target = '=[SMODS aikoyorisshenanigans "./modules/hooks/scoring.lua"]'
+pattern = '''extratrigs = extratrigs + (scored_card and scored_card.edition and scored_card.edition.akyrs_card_extra_triggers or 0)'''
+position = 'after'
+payload = '''if scored_card and scored_card.edition and scored_card.edition.akyrs_sliced and next(SMODS.find_card("j_foobar_splitdance")) then extratrigs = extratrigs + 1 end'''
+match_indent = true
+

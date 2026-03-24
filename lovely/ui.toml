@@ -1,0 +1,163 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# insert my own UI into the deck
+[[patches]]
+[patches.pattern]
+target = 'functions/UI_definitions.lua'
+pattern = '''function G.UIDEF.deck_info(_show_remaining)
+  return create_UIBox_generic_options({contents ={create_tabs(
+    {tabs = _show_remaining and {
+        {
+          label = localize('b_remaining'),
+          chosen = true,
+          tab_definition_function = G.UIDEF.view_deck,
+          tab_definition_function_args = true,
+        },
+        {
+            label = localize('b_full_deck'),
+            tab_definition_function = G.UIDEF.view_deck
+        },
+    } or {
+      {
+        label = localize('b_full_deck'),
+        chosen = true,
+        tab_definition_function = G.UIDEF.view_deck
+      },
+    },
+    tab_h = 8,
+    snap_to_nav = true})}})
+end'''
+position = 'at'
+payload = '''function G.UIDEF.deck_info(_show_remaining)
+	local tabs = {
+		tabs = _show_remaining and {
+        {
+          label = localize('b_remaining'),
+          chosen = true,
+          tab_definition_function = G.UIDEF.view_deck,
+          tab_definition_function_args = true,
+        },
+        {
+            label = localize('b_full_deck'),
+            tab_definition_function = G.UIDEF.view_deck
+        },
+    } or {
+      {
+        label = localize('b_full_deck'),
+        chosen = true,
+        tab_definition_function = G.UIDEF.view_deck
+      },
+    },
+    tab_h = 8,
+    snap_to_nav = true
+	}
+	if G.GAME.foobar_adaptive then
+		tabs.tabs[#tabs.tabs + 1] = {
+			label = "Bonuses",
+			tab_definition_function = G.UIDEF.foobar_view_bonuses
+		}
+	end
+  return create_UIBox_generic_options({contents ={create_tabs(tabs)}})
+end'''
+match_indent = true
+
+
+
+# insert formatting for the minigame selection box
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''local _tag = e.UIBox:get_UIE_by_ID('tag_'..e.config.id)
+          local _tag_container = e.UIBox:get_UIE_by_ID('tag_container')'''
+position = "after"
+payload = '''local _minigame = e.UIBox:get_UIE_by_ID('minigame_'..e.config.id)'''
+match_indent = true
+
+
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''if _tag and _tag_container then 
+              _tag_container.children[2].config.draw_after = false
+              _tag_container.children[2].config.colour = G.C.BLACK
+              _tag.children[2].config.button = 'skip_blind'
+              _tag.config.outline_colour = adjust_alpha(G.C.BLUE, 0.5)
+              _tag.children[2].config.hover = true
+              _tag.children[2].config.colour = G.C.RED
+              _tag.children[2].children[1].config.colour = G.C.UI.TEXT_LIGHT
+              local _sprite = _tag.config.ref_table
+              _sprite.config.force_focus = nil
+            end'''
+position = "after"
+payload = '''if _minigame and _tag_container then 
+  _tag_container.children[3].config.draw_after = false
+  _tag_container.children[3].config.colour = G.C.BLACK
+  _minigame.children[2].config.button = 'foobar_select_minigame'
+  _minigame.config.outline_colour = adjust_alpha(G.C.BLUE, 0.5)
+  _minigame.children[2].config.hover = true
+  _minigame.children[2].config.colour = G.C.RED
+  _minigame.children[2].children[1].config.colour = G.C.UI.TEXT_LIGHT
+  local _sprite = _minigame.config.ref_table
+  _sprite.config.force_focus = nil
+end'''
+match_indent = true
+
+# insert formatting for the minigame selection box
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''if _tag and _tag_container then 
+              if G.GAME.round_resets.blind_states[e.config.id] == 'Skipped' or
+                 G.GAME.round_resets.blind_states[e.config.id] == 'Defeated' then
+                _tag_container.children[2]:set_role({xy_bond = 'Weak'})
+                _tag_container.children[2]:align(0, 10)
+                _tag_container.children[1]:set_role({xy_bond = 'Weak'})
+                _tag_container.children[1]:align(0, 10)
+              end
+              if G.GAME.round_resets.blind_states[e.config.id] == 'Skipped' then
+                _blind_choice.children.alert = UIBox{
+                  definition = create_UIBox_card_alert({text_rot = -0.35, no_bg = true,text = localize('k_skipped_cap'), bump_amount = 1, scale = 0.9, maxw = 3.4}),
+                  config = {
+                    align="tmi",
+                    offset = {x = 0, y = 2.2},
+                    major = _blind_choice, parent = _blind_choice}
+                }
+              end
+              _tag.children[2].config.button = nil
+              _tag.config.outline_colour = G.C.UI.BACKGROUND_INACTIVE
+              _tag.children[2].config.hover = false
+              _tag.children[2].config.colour = G.C.UI.BACKGROUND_INACTIVE
+              _tag.children[2].children[1].config.colour = G.C.UI.TEXT_INACTIVE
+              local _sprite = _tag.config.ref_table
+              _sprite.config.force_focus = true
+            end'''
+position = "after"
+payload = '''if _minigame and _tag_container then 
+  if G.GAME.round_resets.blind_states[e.config.id] == 'Skipped' or
+      G.GAME.round_resets.blind_states[e.config.id] == 'Defeated' then
+    _tag_container.children[3]:set_role({xy_bond = 'Weak'})
+    _tag_container.children[3]:align(0, 10)
+    _tag_container.children[3]:set_role({xy_bond = 'Weak'})
+  end
+  _minigame.children[2].config.button = nil
+  _minigame.config.outline_colour = G.C.UI.BACKGROUND_INACTIVE
+  _minigame.children[2].config.hover = false
+  _minigame.children[2].config.colour = G.C.UI.BACKGROUND_INACTIVE
+  _minigame.children[2].children[1].config.colour = G.C.UI.TEXT_INACTIVE
+  local _sprite = _minigame.config.ref_table
+  _sprite.config.force_focus = true
+end'''
+match_indent = true
+
+
+# insert formatting for the minigame selection box
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''if (not self.OVERLAY_MENU) or (not self.F_HIDE_BG) then '''
+position = "at"
+payload = '''if ((not self.OVERLAY_MENU) or (not self.F_HIDE_BG)) and not (self.GAME and self.GAME.FOOBAR_MINIGAME) then '''
+match_indent = true

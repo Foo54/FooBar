@@ -1,29 +1,6 @@
 --- Contains all mod jokers
 
-SMODS.Joker{
-	key = "fryer",
-	atlas = "jokers",
-	pos = {x=2,y=1},
-	config = {
-		extra = {
-			money = 1
-		}
-	},
-	cost = 6,
-	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.money}}
-	end,
-	calculate = function(self, card, context)
-		if context.before then
-			if #G.hand.cards > 0 then
-				SMODS.destroy_cards(G.hand.cards[#G.hand.cards], nil, nil, nil)
-				return {
-					dollars = card.ability.extra.money
-				}
-			end
-		end
-	end
-}
+--- Page One
 
 --- Hatsune Miku
 SMODS.Joker{
@@ -33,6 +10,7 @@ SMODS.Joker{
 	pools = {["N25"] = true},
 	rarity = 3,
 	cost = 8,
+	blueprint_compat = false,
 	in_pool = function(self, args)
 		for i, card in ipairs(G.jokers.cards) do
 			if FooBar.safe_get(card.config.center, "pools", "N25") then return true end
@@ -62,9 +40,13 @@ SMODS.Joker{
 			mult = 1
 		}
 	},
+	rarity = 2,
 	cost = 6,
 	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.scale, card.ability.extra.mult}}
+		return {
+			key = next(SMODS.find_card("j_foobar_hatsunemikun25")) and "j_foobar_mizukiakiyama_miku" or nil,
+			vars = {card.ability.extra.scale, card.ability.extra.mult}
+		}
 	end,
 	calculate = function(self, card, context)
 		if context.setting_ability and not context.blueprint then
@@ -102,9 +84,12 @@ SMODS.Joker{
 	},
 	loc_vars = function(self, info_queue, card)
 		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.numerator, card.ability.extra.denominator, "foobar_ena")
-		ret = {vars = {num, dem, card.ability.immutable.count + 1}}
+		ret = {key = "j_foobar_enashinonome", vars = {num, dem, card.ability.immutable.count + 1}}
 		if FooBar.average_probability() then
-			ret.key = "j_foobar_enashinonome_simplex"
+			ret.key = ret.key .. "_simplex"
+		end
+		if next(SMODS.find_card("j_foobar_hatsunemikun25")) then
+			ret.key = ret.key .. "_miku"
 		end
 		return ret
 	end,
@@ -154,7 +139,10 @@ SMODS.Joker{
 	},
 	cost = 6,
 	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.chips, card.ability.extra.loss}}
+		return {
+			key = next(SMODS.find_card("j_foobar_hatsunemikun25")) and "j_foobar_mafuyuasahina_miku" or nil,
+			vars = {card.ability.extra.chips, card.ability.extra.loss}
+		}
 	end,
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
@@ -181,7 +169,8 @@ SMODS.Joker{
 	atlas = "jokers",
 	pos = {x=10,y=0},
 	pools = {["N25"] = true},
-	cost = 4,
+	cost = 6,
+	rarity = 2,
 	config = {
 		extra = {
 			inc = 25,
@@ -192,7 +181,10 @@ SMODS.Joker{
 		}
 	},
 	loc_vars = function(self, info_queue, card)
-		return {vars = {card.ability.extra.inc, card.ability.extra.chips}}
+		return {
+			key = next(SMODS.find_card("j_foobar_hatsunemikun25")) and "j_foobar_kanadeyoisaki_miku" or nil,
+			vars = {card.ability.extra.inc, card.ability.extra.chips}
+		}
 	end,
 	calculate = function(self, card, context)
 		if context.setting_blind and not context.blueprint then
@@ -226,23 +218,69 @@ SMODS.Joker{
 	end
 }
 
+--- Fryer
+SMODS.Joker{
+	key = "fryer",
+	atlas = "jokers",
+	pos = {x=2,y=1},
+	config = {
+		extra = {
+			money = 1
+		}
+	},
+	rarity = 2,
+	cost = 6,
+	blueprint_compat = false,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money}}
+	end,
+	calculate = function(self, card, context)
+		if context.before and not context.blueprint then
+			if #G.hand.cards > 0 then
+				SMODS.destroy_cards(G.hand.cards[#G.hand.cards], nil, nil, nil)
+				return {
+					dollars = card.ability.extra.money
+				}
+			end
+		end
+	end
+}
+
 --- Simplex
 SMODS.Joker{
 	key = "simplex",
 	atlas = "jokers",
 	pos = {x=0,y=1},
 	rarity = 2,
-	cost = 8
+	cost = 8,
+	blueprint_compat = false
 }
 
-if false then
 --- Graphics Card
 SMODS.Joker{
 	key = "graphicscard",
 	atlas = "jokers",
-	pos = {x=1, y=1}
+	pos = {x=1, y=1},
+	config = {
+		extra = {
+			scale = 2
+		}
+	},
+	cost = 4,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.scale, card.sell_cost * card.ability.extra.scale}}
+	end,
+	calculate = function(self, card, context)
+		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+			G.GAME.foobar_inflation = (G.GAME.foobar_inflation or 0) + 1
+		end
+		if context.joker_main then
+			return {
+				mult = card.sell_cost * card.ability.extra.scale
+			}
+		end
+	end,
 }
-end
 
 --- Nothing
 SMODS.Joker{
@@ -408,7 +446,7 @@ SMODS.Joker{
 				xmult = card.ability.extra.mult
 			}
 		end
-		if context.final_scoring_step and G.GAME.blind and SMODS.last_hand_oneshot then
+		if context.final_scoring_step and G.GAME.blind and SMODS.last_hand_oneshot and not context.blueprint then
 			card.ability.extra.timer = card.ability.extra.timer - 1
 			if card.ability.extra.timer <= 0 then
 				return {
@@ -520,10 +558,9 @@ SMODS.Joker{
 	key = "welcomenewmember",
 	atlas = "jokers",
 	cost = 9,
-	rarity = 3,
 	config = {
 		extra = {
-			scaling = 67
+			scaling = 6.7
 		}
 	},
 	pos = {x = 0, y = 0},
@@ -535,6 +572,439 @@ SMODS.Joker{
 		if context.joker_main then
 			return {
 				chips = card.ability.extra.scaling * math.max(0, (G.playing_cards and (#G.playing_cards - G.GAME.starting_deck_size) or 0))
+			}
+		end
+	end
+}
+
+--- Page Two
+
+--- baguette
+SMODS.Joker{
+	key = "baguette",
+	atlas = "jokers",
+	pos = {x=3, y=1},
+	config = {
+		extra = {
+			money = 1
+		},
+		immutable = {
+			rounds = 4
+		}
+	},
+	cost = 4,
+	eternal_compat = false,
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money, card.ability.immutable.rounds}}
+	end,
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card:is_face() then
+				return {
+					dollars = card.ability.extra.money
+				}
+			end
+		end
+		if context.end_of_round and context.game_over == false and context.main_eval and not context.blueprint then
+			card.ability.immutable.rounds = card.ability.immutable.rounds - 1
+			if card.ability.immutable.rounds == 0 then
+				SMODS.destroy_cards(card, nil, nil, nil)
+				return {
+					message = localize('k_eaten_ex'),
+					colour = G.C.RED
+				}
+			else
+				return {
+					message = "nom!",
+					colour = G.C.YELLOW,
+					func = function(...)
+						G.E_MANAGER:add_event(Event({
+							func = function()
+								self:set_sprites(card, card.config.center)
+								return true
+							end
+						}))
+					end
+				}
+			end
+		end
+	end,
+	set_sprites = function(self, card, front)
+		if card.ability and card.ability.immutable and card.ability.immutable.rounds > 0 then
+			card.children.center:set_sprite_pos({x = 3 + 4 - card.ability.immutable.rounds, y = 1})
+		end
+	end
+}
+
+--- nic
+SMODS.Joker{
+	key = "nic",
+	atlas = "jokers",
+	pos = {x=7,y=1},
+	config = {
+		extra = {
+			money = 67
+		}
+	},
+	cost = 25,
+	rarity = 4,
+	pools = {["nic"] = true, ["Producer"] = true},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money}}
+	end,
+	calculate = function(self, card, context)
+		if context.joker_main then
+			if G.GAME.dollars + (G.GAME.dollar_buffer or 0) == 67 then
+				return {
+---@diagnostic disable-next-line: undefined-field
+					chips = G.GAME.blind.chips,
+					message = "nic"
+				}
+			end
+		end
+	end,
+	calc_dollar_bonus = function(self, card)
+		return card.ability.extra.money
+	end
+}
+
+--- Le fish au chocolat
+SMODS.Joker{
+	key = "lefisheauchocolat",
+	atlas = "jokers",
+	pos = {x=8,y=1},
+	cost = 7,
+	rarity = 2,
+	config = {
+		extra = {
+			num = 1,
+			dem = 7,
+			mult = 7
+		},
+		immutable = {
+			counter = 1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		local key = self.key
+		if FooBar.average_probability() then key = key .. "_simplex" end
+		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "foobar_lefishauchocolat")
+		return {key = key, vars = {num, dem, card.ability.extra.mult}}
+	end,
+	calculate = function(self, card, context)
+		if context.stay_flipped and not context.blueprint then
+			if context.from_area == G.deck and context.to_area == G.hand then
+				local flag = false
+				if FooBar.average_probability() then --- REALY LAGGY: FIX THIS
+					local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "foobar_lefishauchocolat")
+					card.ability.immutable.count = (card.ability.immutable.count + 1) % dem
+					flag = card.ability.immutable.count < num
+				else
+					flag = SMODS.pseudorandom_probability(card, "foobar_lefishauchocolat", card.ability.extra.num, card.ability.extra.dem)
+				end
+				if flag then
+					return {
+						stay_flipped = true
+					}
+				end
+			end
+			if context.from_area == G.hand and (context.to_area == G.play or context.to_area == "unscored") then
+				return {
+					stay_flipped = true
+				}
+			end
+		end
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.facing == "back" then
+				return {
+					mult = card.ability.extra.mult
+				}
+			end
+		end
+		if context.check_enhancement and context.other_card.cardarea ~= G.deck and not context.blueprint then
+			if context.other_card.facing == "back" then
+				return {
+					m_wild = true
+				}
+			end
+		end
+	end
+}
+
+--- Adachi Rei
+SMODS.Joker{
+	key = "adachirei",
+	atlas = "jokers",
+	pos = {x=9,y=1},
+	config = {
+		extra = {
+			cmult = 30,
+			chips = 0
+		}
+	},
+	cost = 4,
+	loc_vars = function(self, info_queue, card)
+		return {
+			main_start = {
+				{ n = G.UIT.T, config = { text = ' +', colour = G.C.CHIPS, scale = 0.32 } },
+				{
+					n = G.UIT.O,
+					config = {
+						object = DynaText({
+							string = {
+								{prefix = "", ref_table = card.ability.extra, ref_value = "chips"}
+							},
+							colours = { G.C.CHIPS },
+							bump = true,
+							pop_in_rate = 999999,
+							silent = true,
+							pop_delay = 0.1,
+							scale = 0.32,
+							min_cycle_time = 0.1
+						})
+					}
+				},
+				{ n = G.UIT.T, config = { text = ' chips', colour = G.C.CHIPS, scale = 0.32 } },
+			},
+			vars = {card.ability.extra.cmult}
+		}
+	end,
+	update = function(self, card, dt)
+		card.ability.extra.chips = math.floor(card.ability.extra.cmult * math.sin(love.timer.getTime())) + card.ability.extra.cmult
+	end,
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				chips = card.ability.extra.chips
+			}
+		end
+	end
+}
+
+--- Whiplash
+SMODS.Joker{
+	key = "whiplash",
+	atlas = "jokers",
+	pos = {x=10,y=1},
+	config = {
+		extra = {
+			handsize_loss = 1
+		},
+		immutable = {
+			active = false
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.immutable.active and "Active" or "Inactive", -card.ability.extra.handsize_loss}}
+	end,
+	rarity = 2,
+	cost = 7,
+	add_to_deck = function(self, card, from_debuff)
+			G.hand:change_size(-card.ability.extra.handsize_loss)
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+			G.hand:change_size(card.ability.extra.handsize_loss)
+	end,
+	calculate = function(self, card, context)
+		if context.setting_blind and not context.blueprint then
+			card.ability.immutable.active = true
+			juice_card_until(card, function() return not G.RESET_JIGGLES and card.ability.immutable.active end, true)
+		end
+	end
+}
+
+--- Mitosis
+SMODS.Joker{
+	key = "mitosis",
+	atlas = "jokers",
+	pos = {x=11,y=1},
+	config = {
+		immutable = {
+			num = 1,
+			dem = 2,
+			state = true
+		}
+	},
+	rarity = 3,
+	cost = 9,
+	loc_vars = function(self, info_queue, card)
+		return {
+			key = self.key .. (FooBar.average_probability() and "_simplex" or ""),
+			vars = {card.ability.immutable.num, card.ability.immutable.dem}
+		}
+	end,
+	blueprint_compat = false,
+	calculate = function(self, card, context)
+		if not context.blueprint and context.using_consumeable then
+			local flag = false
+			if FooBar.average_probability() then
+---@diagnostic disable-next-line: cast-local-type
+				flag = card.ability.immutable.state
+				card.ability.immutable.state = not card.ability.immutable.state
+			else
+				flag = pseudorandom("mitosis_duplicate", 0, 1) < 0.5
+			end
+			if flag then
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						local copied_card = copy_card(context.consumeable, nil)
+						copied_card:add_to_deck()
+						G.consumeables:emplace(copied_card)
+						return true
+					end
+				}))
+				return {
+					message = "Duplicated!"
+				}
+			end
+			return {
+				message = "Nope!"
+			}
+		end
+	end
+}
+
+--- Cigarette
+SMODS.Joker{
+	key = "cigarette",
+	atlas = "jokers",
+	pos = {x=0, y=2},
+	rarity=3,
+	cost=6,
+	config = {
+		extra = {
+			hand_size = 1,
+			destroyed = 1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.hand_size, card.ability.extra.destroyed}}
+	end,
+	calculate = function(self, card, context)
+		if context.last_hand_oneshot and context.main_eval and context.end_of_round then
+			for i = 1, card.ability.extra.destroyed do
+				local card = pseudorandom_element(G.deck.cards, "cigarette_lung_cancer")
+				if card then
+					SMODS.destroy_cards(card)
+				end
+			end
+		end
+	end,
+	add_to_deck = function(self, card, from_debuff)
+		G.hand:change_size(-card.ability.extra.hand_size)
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		G.hand:change_size(card.ability.extra.hand_size)
+	end
+}
+
+--- Kasane Teto
+SMODS.Joker{
+	key = "teto",
+	atlas = "jokers",
+	pos = {x=1, y=2},
+	soul_pos = {x=2, y=2},
+	rarity = 4,
+	cost = 25,
+	config = {
+		extra = {
+			chips = 3.1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips}}
+	end,
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card:is_suit("Hearts") or context.other_card:get_id() == 4 or context.other_card:get_id() == 14 then
+				return {
+					xchips = card.ability.extra.chips
+				}
+			end
+		end
+	end
+}
+
+--- Teto Pear
+SMODS.Joker{
+	key = "pearto",
+	atlas = "jokers",
+	pos = {x=3,y=2},
+	rarity = 2,
+	cost = 3,
+	config = {
+		extra = {
+			num = 1,
+			dem = 401,
+			destroy = 31
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.j_foobar_teto
+		local num1, dem1 = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "pearto")
+		local num2, dem2 = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.destroy, "pearto_consume")
+		return {vars = {num1, dem1, num2, dem2}}
+	end,
+	calculate = function(self, context, card)
+		if context.end_of_round and context.main_eval then
+			if SMODS.pseudorandom_probability(card, "pearto", card.ability.extra.num, card.ability.extra.dem) then
+				SMODS.add_card{key="j_foobar_teto"}
+			end
+			if SMODS.pseudorandom_probability(card, "perto_consume", card.ability.extra.num, card.ability.extra.destroy) then
+				SMODS.destroy_cards(card)
+			end
+		end
+	end
+}
+
+--- Companion Cube
+SMODS.Joker{
+	key = "companioncube",
+	atlas = "jokers",
+	pos = {x=4,y=2},
+	rarity = 3,
+	cost = 17,
+	add_to_deck = function(self, card, from_debuff)
+		G.jokers.config.card_limit = G.jokers.config.card_limit + 1
+	end,
+	remove_from_deck = function(self, card, from_debuff)
+		G.jokers.config.card_limit = G.jokers.config.card_limit - 1
+	end
+}
+
+--- Feedback
+SMODS.Joker{
+	key = "feedback",
+	atlas = "jokers",
+	pos = {x=5,y=2},
+	cost = 5,
+	config = {
+		extra = {
+			mult = 0,
+			scaling = 3
+		}
+	},
+	pools = {["Song"] = true, ["MonochroMenace"] = true},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.mult, card.ability.extra.scaling}}
+	end,
+	calculate = function(self, card, context)
+		if context.before and not context.blueprint then
+			local scaled = true
+			for key, value in ipairs(context.scoring_hand) do
+				if value:get_id() == 14 and value.base.suit == "Spades" and SMODS.has_enhancement(value, "m_wild") then
+					SMODS.scale_card(card, {
+						ref_table = card.ability.extra,
+						ref_value = "mult",
+						scalar_value = "scaling"
+					})
+					break
+				end
+			end
+		end
+		if context.joker_main then
+			return {
+				mult = card.ability.extra.mult
 			}
 		end
 	end

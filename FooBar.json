@@ -1,0 +1,12 @@
+{
+	"id": "foobar",
+	"name": "FooBar",
+	"display_name": "FooBar",
+	"author": ["Foo54"],
+	"description": "Random bullcrap go (mainly vocaloids) (and minigames)",
+	"prefix": "foobar",
+	"main_file": "main.lua",
+	"priority": 0,
+	"badge_colour": "222222",
+	"version": "0.12-dev"
+}

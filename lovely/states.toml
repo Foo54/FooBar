@@ -1,0 +1,35 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 9999999
+
+# Create minigame state
+[[patches]]
+[patches.pattern]
+target = 'game.lua'
+pattern = '''if self.STATE == self.STATES.MENU then
+            self:update_menu(dt)
+        end'''
+position = 'after'
+payload = '''if self.STATE == self.STATES.FOOBAR_MINIGAME then
+	self:update_foobar_minigame(dt)
+end'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'globals.lua'
+pattern = '''    self.STATES = {    '''
+position = 'after'
+payload = '''FOOBAR_MINIGAME = 10001,'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'functions/button_callbacks.lua'
+pattern = '''G.GAME.round_resets.blind_tags.Big = get_next_tag_key()'''
+position = 'after'
+payload = '''G.GAME.round_resets.foobar_minigames = G.GAME.round_resets.foobar_minigames or {}
+G.GAME.round_resets.foobar_minigames.Small = FooBar.get_next_minigame_key()
+G.GAME.round_resets.foobar_minigames.Big = FooBar.get_next_minigame_key()'''
+match_indent = true

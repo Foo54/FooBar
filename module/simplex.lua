@@ -1,3 +1,4 @@
+---@diagnostic disable: redundant-parameter
 local DEF_PROB = "foobar_default_probability"
 
 --- 8 Ball
