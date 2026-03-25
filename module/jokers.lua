@@ -1049,3 +1049,71 @@ SMODS.Joker{
 		end
 	end
 }
+
+--- Plagiarism
+SMODS.Joker{
+	key="plagiarism",
+	atlas = "ai",
+	pos = {x=0,y=0},
+	cost=10,
+	rarity=3,
+	config = {
+		immutable = {
+			copies = 2,
+			key1 = nil,
+			key2 = nil
+		}
+	},
+	blueprint_compat = false,
+	loc_vars = function (self, info_queue, card)
+		local card1 = "None"
+		local card2 = "None"
+		if card.ability.immutable.key1 then
+			local card = G.P_CENTERS[card.ability.immutable.key1]
+			info_queue[#info_queue+1] = card
+			card1 = card.name
+		end
+		if card.ability.immutable.key2 then
+			local card = G.P_CENTERS[card.ability.immutable.key2]
+			info_queue[#info_queue+1] = card
+			card2 = card.name
+		end
+		return {vars = {card.ability.immutable.copies, card1, card2}}
+	end,
+	calculate = function(self, card, context)
+		if context.setting_blind and not context.blueprint then
+			local valid_jokers = {}
+			for _, joker in ipairs(G.jokers.cards) do
+				if joker.config.center.key ~= card.config.center.key and (not joker.edition or joker.edition.key ~= "e_negative") then
+					table.insert(valid_jokers, joker.config.center.key)
+				end
+			end
+			if #valid_jokers == 1 then
+				card.ability.immutable.key1 = valid_jokers[1]
+			elseif #valid_jokers > 0 then
+				card.ability.immutable.key1 = pseudorandom_element(valid_jokers, "plagiarism_select_card_1")
+				card.ability.immutable.key2 = pseudorandom_element(valid_jokers, "plagiarism_select_card_2")
+			end
+		end
+		if card.ability.immutable.key1 and not context.blueprint then
+			local first_done = false
+			local second_done = false
+			local ret = {}
+			for _, joker in ipairs(G.jokers.cards) do
+				if joker.config.center.key == card.ability.immutable.key1 and not first_done then
+					ret = SMODS.merge_effects({ret, SMODS.blueprint_effect(card, joker, context)})
+					first_done = true
+				end
+				if joker.config.center.key == card.ability.immutable.key2 and not second_done then
+					ret = SMODS.merge_effects({ret, SMODS.blueprint_effect(card, joker, context)})
+					second_done = true
+				end
+				if first_done and second_done then
+					break
+				end
+			end
+			if ret then ret.color = G.C.ORANGE end
+			return ret
+		end
+	end
+}

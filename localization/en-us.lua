@@ -411,6 +411,21 @@ return {
 					"or {C:chips}#3#{} to {C:chips}#4#{} chips",
 					"when scored"
 				}
+			},
+			j_foobar_plagiarism = {
+				name = "Plagiarism",
+				text = {
+					{
+						"Copies {C:attention}#1#{} random",
+						"non-{C:dark_edition}negative{} jokers",
+						"you own every round",
+						"{C:inactive,s:0.8}can copy the same card twice"
+					},
+					{
+						"Currently copying",
+						"{C:attention}#2#{} and {C:attention}#3#"
+					}
+				}
 			}
 		},
 		Enhanced = {
