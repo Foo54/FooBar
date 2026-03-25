@@ -1,5 +1,6 @@
 FooBar.pjsk_charts = {}
 FooBar.pjsk_chart_keys = {}
+FooBar.pjsk_chart_atlases = {}
 FooBar.pjsk_chart_info = {}
 
 print("Foobar > projectsekai | Loading chart data")
@@ -15,7 +16,12 @@ for _, file in ipairs(files) do
 				title = ret.title,
 				artists = ret.artists
 			}
-			print(ret.key)
+			FooBar.pjsk_chart_atlases[ret.key] = SMODS.Atlas{
+				key="minigame_" .. ret.key,
+				path = "covers/"..ret.key..".png",
+				px=300,
+				py=300
+			}
 			SMODS.Sound{
 				key = "music_"..ret.key,
 				path = ret.key .. ".ogg",
@@ -92,8 +98,7 @@ FooBar.Minigame{
 		self.ability.future_notes = copy_table(FooBar.pjsk_charts[self.ability.current_song])
 		self.ability.title = FooBar.pjsk_chart_info[self.ability.current_song].title
 		self.ability.artists = copy_table(FooBar.pjsk_chart_info[self.ability.current_song].artists)
-		self.ability.cover_path = "Mods/FooBar/assets/covers/" .. self.ability.current_song .. ".png"
-		self.ability.cover_image = love.graphics.newImage(self.ability.cover_path)
+		self.ability.cover_image = FooBar.pjsk_chart_atlases[self.ability.current_song].image
 	end,
 	love_update = function(self, dt)
 		if G.SETTINGS.paused then return end
