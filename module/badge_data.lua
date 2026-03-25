@@ -34,5 +34,9 @@ FooBar.badge_data = {
 	aiko = {
 		name = "AikoShen Crossmod",
 		color = HEX("ff475a")
+	},
+	Haraguchi = {
+		name = "Sasuke Haraguchi",
+		color= HEX("EC2B16")
 	}
 }

@@ -1010,3 +1010,42 @@ SMODS.Joker{
 	end
 }
 
+
+
+--- HITO Mania
+SMODS.Joker{
+	key = "hitomania",
+	atlas = "jokers",
+	pos = {x=6,y=2},
+	cost=5,
+	config = {
+		extra = {
+			min_mult = 1,
+			max_mult = 10,
+			min_chips = 1,
+			max_chips = 60
+		}
+	},
+	pools = {["Song"] = true, ["Haraguchi"] = true},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.min_mult, card.ability.extra.max_mult, card.ability.extra.min_chips, card.ability.extra.max_chips}}
+	end,
+	blueprint_compat = true,
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card:is_face() then
+				local mult = pseudorandom("hito_mult", card.ability.extra.min_mult, card.ability.extra.max_mult)
+				local chips = pseudorandom("hito_chips", card.ability.extra.min_chips, card.ability.extra.max_chips)
+				if pseudorandom("hito_determine", 1, 2) == 1 then
+					mult = 0
+				else
+					chips = 0
+				end
+				return {
+					mult = mult,
+					chips = chips
+				}
+			end
+		end
+	end
+}

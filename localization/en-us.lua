@@ -402,6 +402,15 @@ return {
 					"a {C:attention}wild ace of spades{}",
 					"{C:inactive}[Currently {C:mult}+#1#{C:inactive} Mult]"
 				}
+			},
+			j_foobar_hitomania = {
+				name = "HITO Mania",
+				text = {
+					"Played {C:attention}face{} cards",
+					"give {C:mult}#1#{} to {C:mult}#2#{} mult,",
+					"or {C:chips}#3#{} to {C:chips}#4#{} chips",
+					"when scored"
+				}
 			}
 		},
 		Enhanced = {
