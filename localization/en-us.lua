@@ -597,7 +597,34 @@ return {
 				}
 			}
 		},
+		Voicebank = {
+			c_foobar_vb_meiko = {
+				name = "MEIKO",
+				text = {
+					"All {C:hearts}#1#{} are {C:attention}retriggered",
+					"{C:green}#2# in #3#{} chance for non-{C:hearts}#1#{}",
+					"to be {C:red}debuffed"
+				}
+			}
+		},
+		Edition = {
+			e_foobar_working = {
+				name = "Active!",
+				text = {
+					"This card is {C:green}active!"
+				}
+			}
+		},
 		Other = {
+			foobar_vb_info = {
+				name = "Voicebank Info",
+				text = {
+					"Using an inactive {V:1}Voicebank",
+					"makes it {C:dark_edition}negative{} and {C:purple}eternal",
+					"and {C:red}destroys{} active {V:1}Voicebanks",
+					"Using an active {V:1}Voicebank {C:red}destroys it"
+				}
+			},
 			ba_bl_hook = {
 				text = {
 					"Retrigger {C:attention}2{} random cards",
@@ -774,14 +801,15 @@ return {
 				}
 			}
 		}
+	},
+	misc = {
+		dictionary = {
+			k_voicebank = "Voicebank",
+			b_voicebank_cards = "Voicebank"
+		},
+		labels = {
+			voicebank = "Voicebank",
+			foobar_working = "Active!"
+		}
 	}
 }
-
---[[
-
-voucher
-If wheel of fortunes fail
-1 in 10 chance to give
-Negative edition
-
-]]--

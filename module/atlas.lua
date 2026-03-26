@@ -32,3 +32,17 @@ SMODS.Atlas{
 	px = 71,
 	py = 95
 }
+
+SMODS.Atlas{
+	key="ai",
+	path="AI.png",
+	px=172,
+	py=190
+}
+
+SMODS.Atlas{
+	key = "voicebanks",
+	path = "voicebanks.png",
+	px = 71,
+	py = 95
+}

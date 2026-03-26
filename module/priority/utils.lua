@@ -14,6 +14,29 @@ function FooBar.safe_get(t, ...)
 	return current
 end
 
+function FooBar.recalculate_debuffs()
+	if G.hand then
+		for _, card in ipairs(G.hand.cards) do
+			local flags = SMODS.calculate_context({ debuff_card = card, ignore_debuff = true })
+			if flags.prevent_debuff then
+				if card.debuff then card:set_debuff(false) end
+			elseif flags.debuff then
+				if not card.debuff then card:set_debuff(true) end
+			end
+		end
+	end
+	if G.deck then
+		for _, card in ipairs(G.deck.cards) do
+			local flags = SMODS.calculate_context({ debuff_card = card, ignore_debuff = true })
+			if flags.prevent_debuff then
+				if card.debuff then card:set_debuff(false) end
+			elseif flags.debuff then
+				if not card.debuff then card:set_debuff(true) end
+			end
+		end
+	end
+end
+
 --Utility function to check things without erroring | copied from cryptid
 ---@param t table
 ---@param ta table

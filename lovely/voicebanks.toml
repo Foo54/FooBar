@@ -1,0 +1,15 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 9999999
+
+# prevent selling active voicebanks
+[[patches]]
+[patches.pattern]
+target = 'card.lua'
+pattern = '''if (G.SETTINGS.tutorial_complete or G.GAME.pseudorandom.seed ~= 'TUTORIAL' or G.GAME.round_resets.ante > 1) and'''
+position = 'before'
+payload = '''
+if self.config.center.set == "Voicebank" and self.ability.immutable._active then return false end
+'''
+match_indent = true
