@@ -18,6 +18,16 @@ local function use_voicebank(_vb, card, area, copier, disable, enable)
 		if enable then enable() end
 	end
 end
+local function add_vb_info (info_queue)
+	info_queue[#info_queue + 1] = {set = "Other", key = "foobar_vb_info", vars = {colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour}}}
+end
+local function generate_active_status (active)
+	if not active then
+		return {n = G.UIT.R, config = { padding = 0.1, colour = G.C.RED, r = 0.1}, nodes = {
+		{n = G.UIT.T, config = {scale = 0.3, text = "Inactive"}}
+	}}
+	end
+end
 
 SMODS.ConsumableType{
 	key = "Voicebank",
@@ -30,19 +40,21 @@ SMODS.ConsumableType{
 		card.can_use = card.can_use or function(self, card) return true end
 		card.keep_on_use = card.keep_on_use or function(self, card) return not card.ability.immutable._active end
 		card.use = card.use or use_voicebank
+		card.pixel_size = card.pixel_size or {h = 66 + 20}
+		card.config = card.config or {}
+		card.config.immutable = card.config.immutable or {}
+		card.config.immutable._active = card.config.immutable._active or false
+		local mem_loc_vars = card.loc_vars or function() return {} end
+		card.loc_vars = function(_self, info_queue, _card)
+			add_vb_info(info_queue)
+			local main_end = generate_active_status(_card.ability.immutable._active)
+			local ret = mem_loc_vars(_self, info_queue, _card)
+			if main_end then ret.main_end = ret.main_end or {main_end} end
+			return ret
+		end
 	end
 }
 
-local function add_vb_info (info_queue)
-	info_queue[#info_queue + 1] = {set = "Other", key = "foobar_vb_info", vars = {colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour}}}
-end
-local function generate_active_status (active)
-	if not active then
-		return {n = G.UIT.R, config = { padding = 0.1, colour = G.C.RED, r = 0.1}, nodes = {
-		{n = G.UIT.T, config = {scale = 0.3, text = "Inactive"}}
-	}}
-end
-end
 
 SMODS.Edition{
 	key = "working",
@@ -59,7 +71,6 @@ SMODS.Consumable{
 	set = "Voicebank",
 	atlas = "voicebanks",
 	pos = {x=1, y=0},
-	pixel_size = {h = 66 + 20},
 	config = {
 		extra = {
 			num = 1,
@@ -67,17 +78,13 @@ SMODS.Consumable{
 		},
 		immutable = {
 			suit = "Hearts",
-			_active = false,
 			counter = 0
 		}
 	},
 	loc_vars = function(self, info_queue, card)
-		add_vb_info(info_queue)
 		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "meiko_debuff")
-		local main_end = generate_active_status(card.ability.immutable._active)
 		local ret = {vars = {card.ability.immutable.suit, num, dem}}
 		if FooBar.average_probability() then ret.key = self.key .. "_simplex" end
-		if main_end then ret.main_end = {main_end} end
 		return ret
 	end,
 	use = function(self, card, area, copier)
@@ -123,23 +130,17 @@ SMODS.Consumable{
 	set = "Voicebank",
 	atlas = "voicebanks",
 	pos = {x=2,y=0},
-	pixel_size = {h = 66 + 20},
 	config = {
 		extra = {
 			chips_gain = 10,
 			mult_gain = 1
 		},
 		immutable = {
-			_active = false,
 			suit = "Clubs"
 		}
 	},
 	loc_vars = function(self, info_queue, card)
-		add_vb_info(info_queue)
-		local main_end = generate_active_status(card.ability.immutable._active)
-		local ret = {vars = {card.ability.immutable.suit, card.ability.extra.chips_gain, card.ability.extra.mult_gain}}
-		if main_end then ret.main_end = {main_end} end
-		return ret
+		return {vars = {card.ability.immutable.suit, card.ability.extra.chips_gain, card.ability.extra.mult_gain}}
 	end,
 	calculate = function(self, card, context)
 		if card.ability.immutable._active then
@@ -162,6 +163,34 @@ SMODS.Consumable{
 						})
 					end
 				end
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	key = "vb_rinlen",
+	atlas = "voicebanks",
+	pos = {x=3,y=0},
+	set = "Voicebank",
+	config = {
+		extra = {
+			money_gain = 1,
+			money_loss = -1,
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.money_gain}}
+	end,
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.end_of_round and context.individual and context.cardarea == G.hand then
+				SMODS.scale_card(card, {
+					ref_table = context.other_card.ability,
+					ref_value = "perma_h_dollars",
+					scalar_table = card.ability.extra,
+					scalar_value = pseudorandom_element({"money_gain", "money_loss"}, "rinlen_choice")
+				})
 			end
 		end
 	end

@@ -620,6 +620,19 @@ return {
 					"Scored {C:clubs}#1#{} permanently gain",
 					"{C:blue}+#2#{} chips and {C:red}+#3#{} mult"
 				}
+			},
+			c_foobar_vb_rinlen = {
+				name = {
+					"Kagamine Rin",
+					"Kagamine Len"
+				},
+				text = {
+					"Cards {C:attention}held in hand",
+					"at {C:attention}end of round",
+					"either gain or lose",
+					"{C:money}$#1#{} when {C:attention}held in hand",
+					"at {C:attention}end of round"
+				}
 			}
 		},
 		Edition = {
