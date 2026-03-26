@@ -629,9 +629,69 @@ return {
 				text = {
 					"Cards {C:attention}held in hand",
 					"at {C:attention}end of round",
-					"either gain or lose",
-					"{C:money}$#1#{} when {C:attention}held in hand",
-					"at {C:attention}end of round"
+					"gain {C:money}$#1#{} when",
+					"either {C:attention}held in hand",
+					"at {C:attention}end of round",
+					"or scored"
+				}
+			},
+			c_foobar_vb_miku = {
+				name = "Hatsune Miku",
+				text = {
+					"Scored {C:attention}#1#{}'s and {C:attention}#2#{}'s",
+					"permanently gain {X:blue,C:white}X#3#{} chips"
+				}
+			},
+			c_foobar_vb_luka = {
+				name = "Megurine Luka",
+				text = {
+					"After hand is drawn",
+					"draw up to {C:attention}#1#{} cards",
+					"of the same rank",
+					"of a random card in hand"
+				}
+			},
+			c_foobar_vb_neru = {
+				name = "Akita Neru",
+				text = {
+					{
+						"{C:attention}Copies{} most effects",
+						"of a random {V:1}Voicebank",
+						"every {C:attention}round"
+					},
+					{
+						"Currently copying {C:attention}#1#"
+					}
+				}
+			},
+			c_foobar_vb_sv_teto = {
+				name = {
+					"Kasane Teto",
+					"{s:0.7}SynthV"
+				},
+				text = {
+					"If played hand is",
+					"a {C:attention}#1#{} of {C:hearts}#2#",
+					"create a copy of scored cards",
+					"at the bottom of the deck"
+				}
+			},
+			c_foobar_vb_utau_teto = {
+				name = {
+					"Kasane Teto",
+					"{s:0.7}UTAU"
+				},
+				text = {
+					"Scored {C:hearts}#1#{} permanently gain",
+					"{X:mult,C:white}X#2#{} mult when {C:attention}held in hand"
+				}
+			},
+			c_foobar_vb_momone = {
+				name = "Momo Momone",
+				text = {
+					"If first hand of round",
+					"contains more than {C:attention}#1#{} card",
+					"make the last card {C:dark_edition}Polychrome"
 				}
 			}
 		},
@@ -833,7 +893,7 @@ return {
 	misc = {
 		dictionary = {
 			k_voicebank = "Voicebank",
-			b_voicebank_cards = "Voicebank"
+			b_voicebank_cards = "Voicebanks"
 		},
 		labels = {
 			voicebank = "Voicebank",
