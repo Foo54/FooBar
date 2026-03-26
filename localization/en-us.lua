@@ -605,6 +605,21 @@ return {
 					"{C:green}#2# in #3#{} chance for non-{C:hearts}#1#{}",
 					"to be {C:red}debuffed"
 				}
+			},
+			c_foobar_vb_meiko_simplex = {
+				name = "MEIKO",
+				text = {
+					"All {C:hearts}#1#{} are {C:attention}retriggered",
+					"{C:green}#2# out of every #3#{} non-{C:hearts}#1#{}",
+					"are {C:red}debuffed"
+				}
+			},
+			c_foobar_vb_kaito = {
+				name = "KAITO",
+				text = {
+					"Scored {C:clubs}#1#{} permanently gain",
+					"{C:blue}+#2#{} chips and {C:red}+#3#{} mult"
+				}
 			}
 		},
 		Edition = {
