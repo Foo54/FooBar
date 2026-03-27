@@ -755,7 +755,41 @@ return {
 					"Retrigger all {C:attention}Kings{} and {C:attention}Queens",
 					"{C:green}#1# of every #2#{} are retriggered a second time"
 				}
-			}
+			},
+			c_foobar_vb_una = {
+				name = "Otomachi Una",
+				text = {
+					"idk yet"
+				}
+			},
+			c_foobar_vb_yixi = {
+				name = "Yi Xi",
+				text = {
+					"Scored {C:attention}face{} cards permanently gain",
+					"{X:mult,C:white}X#1#{} mult",
+					"but have a {C:green}#2# in #3#{} chance to be {C:red}destroyed"
+				}
+			},
+			c_foobar_vb_yixi_simplex = {
+				name = "Yi Xi",
+				text = {
+					"Scored {C:attention}face{} cards permanently gain",
+					"{X:mult,C:white}X#1#{} mult",
+					"but {C:green}#2# of every #3#{} are {C:red}destroyed"
+				}
+			},
+			c_foobar_vb_ia = {
+				name = "IA",
+				text = {
+					"idk yet"
+				}
+			},
+			c_foobar_vb_forte = {
+				name = "Eleanor Forte",
+				text = {
+					"idk yet"
+				}
+			},
 		},
 		Edition = {
 			e_foobar_working = {

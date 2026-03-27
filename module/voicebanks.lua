@@ -1,5 +1,8 @@
 --- TO ADD
 --- Otomachi Una
+--- Yi Xi
+--- IA
+--- Eleanor Forte
 
 
 local function use_voicebank(_vb, card, area, copier, disable, enable)
@@ -72,7 +75,7 @@ SMODS.Edition{
 	config = {card_limit = 1}
 }
 
-
+-- MEIKO
 SMODS.Consumable{
 	key = "vb_meiko",
 	set = "Voicebank",
@@ -132,6 +135,7 @@ SMODS.Consumable{
 	end
 }
 
+-- KAITO
 SMODS.Consumable{
 	key = "vb_kaito",
 	set = "Voicebank",
@@ -173,6 +177,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Rin & Len
 SMODS.Consumable{
 	key = "vb_rinlen",
 	atlas = "voicebanks",
@@ -200,6 +205,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Miku
 SMODS.Consumable{
 	key = "vb_miku",
 	set = "Voicebank",
@@ -235,6 +241,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Luka
 SMODS.Consumable{
 	key = "vb_luka",
 	set = "Voicebank",
@@ -269,6 +276,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Neru
 SMODS.Consumable{
 	key = "vb_neru",
 	set = "Voicebank",
@@ -322,6 +330,7 @@ SMODS.Consumable{
 	end
 }
 
+-- SV Teto
 SMODS.Consumable{
 	key = "vb_sv_teto",
 	atlas = "voicebanks",
@@ -384,6 +393,7 @@ SMODS.Consumable{
 	end
 }
 
+-- UTAU Teto
 SMODS.Consumable{
 	key = "vb_utau_teto",
 	set = "Voicebank",
@@ -418,6 +428,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Momone
 SMODS.Consumable{
 	set = "Voicebank",
 	key = "vb_momone",
@@ -441,6 +452,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Defoko
 SMODS.Consumable{
 	set = "Voicebank",
 	key = "vb_defoko",
@@ -483,6 +495,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Rei
 SMODS.Consumable{
 	set = "Voicebank",
 	key = "vb_rei",
@@ -517,6 +530,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Yuki
 SMODS.Consumable{
 	set = "Voicebank",
 	key = "vb_yuki",
@@ -581,6 +595,7 @@ SMODS.Consumable{
 	end
 }
 
+-- KAFU
 SMODS.Consumable{
 	key = "vb_kafu",
 	set = "Voicebank",
@@ -599,6 +614,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Flower
 SMODS.Consumable{
 	key = "vb_flower",
 	set = "Voicebank",
@@ -665,6 +681,7 @@ SMODS.Consumable{
 	end
 }
 
+-- Zundamon
 SMODS.Consumable{
 	key = "vb_zundamon",
 	set = "Voicebank",
@@ -705,6 +722,7 @@ SMODS.Consumable{
 	end
 }
 
+-- GUMI
 SMODS.Consumable{
 	key = "vb_gumi",
 	set = "Voicebank",
@@ -747,3 +765,86 @@ SMODS.Consumable{
 		end
 	end
 }
+
+-- Una
+SMODS.Consumable{
+	key = "vb_una",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=2,y=3}
+}
+
+-- Yi Xi
+SMODS.Consumable{
+	key = "vb_yixi",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=3, y=3},
+	config = {
+		extra = {
+			num = 1,
+			dem = 4,
+			xmult_gain = 1
+		},
+		immutable = {
+			counter = 0
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "yixi_consume")
+		local ret = {vars = {card.ability.extra.xmult_gain, num, dem}}
+		if FooBar.average_probability() then ret.key = self.key .. "_simplex" end
+		return ret
+	end,
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.before then
+				for _, _card in ipairs(context.scoring_hand) do
+					if _card:is_face() then
+						SMODS.scale_card(card, {
+							ref_table = _card.ability,
+							ref_value = "perma_x_mult",
+							scalar_table = card.ability.extra,
+							scalar_value = "xmult_gain"
+						})
+					end
+				end
+			end
+			if context.destroy_card and context.cardarea == G.play then
+				if context.destroy_card:is_face() then
+					local flag = false
+					if FooBar.average_probability() then
+						local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "yixi_consume")
+						card.ability.immutable.counter = (card.ability.immutable.counter + 1) % dem
+						flag = card.ability.immutable.counter < num
+					else
+						flag = SMODS.pseudorandom_probability(card, "yixi_consume", card.ability.extra.num, card.ability.extra.dem)
+					end
+					if flag then
+						return {
+							remove = true
+						}
+					end
+				end
+			end
+		end
+	end
+}
+
+-- IA
+SMODS.Consumable{
+	key = "vb_ia",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=4,y=3}
+}
+
+-- Forte
+SMODS.Consumable{
+	key = "vb_forte",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=0,y=4}
+}
+
+
