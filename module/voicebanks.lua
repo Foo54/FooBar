@@ -37,6 +37,17 @@ local function generate_active_status (active)
 	end
 end
 
+local set_edition_ref = Card.set_edition
+---@diagnostic disable-next-line: duplicate-set-field
+function Card.set_edition (self, edition, immediate, silent)
+	if edition == "e_negative" then
+		if self.config.center.set == "Voicebank" then
+			if FooBar.crypton_active() then return end
+		end
+	end
+	return set_edition_ref(self, edition, immediate, silent)
+end
+
 SMODS.ConsumableType{
 	key = "Voicebank",
 	primary_colour = HEX("141414"),

@@ -574,7 +574,7 @@ return {
 				text = {
 					"{V:1}Voicebanks{} do not destroy",
 					"other active {V:1}Voicebanks{} on use",
-					"but don't become {C:dark_edition}negative"
+					"but {C:red}can't{} become {C:dark_edition}negative"
 				}
 			}
 		},
