@@ -568,6 +568,14 @@ return {
 					"a random joker,",
 					"and a random card held in hand"
 				}
+			},
+			c_foobar_vb_crypton = {
+				name = "Crypton Media",
+				text = {
+					"{V:1}Voicebanks{} do not destroy",
+					"other active {V:1}Voicebanks{} on use",
+					"but don't become {C:dark_edition}negative"
+				}
 			}
 		},
 		Tag = {
@@ -809,6 +817,35 @@ return {
 					"Using an active {V:1}Voicebank {C:red}destroys it"
 				}
 			},
+			foobar_vb_info_crypton = {
+				name = "Voicebank Info",
+				text = {
+					"Using an inactive {V:1}Voicebank",
+					"makes it {C:purple}eternal",
+					"Using an active {V:1}Voicebank {C:red}destroys it"
+				}
+			},
+			p_foobar_voicebank_normal = {
+				name = "Voicebank Pack",
+				text = {
+					"Choose {C:attention}#1#{} of up to",
+					"{C:attention}#2#{V:1} Voicebank{} cards to take",
+				}
+			},
+			p_foobar_voicebank_jumbo = {
+				name = "Jumbo Voicebank Pack",
+				text = {
+					"Choose {C:attention}#1#{} of up to",
+					"{C:attention}#2#{V:1} Voicebank{} cards to take",
+				}
+			},
+			p_foobar_voicebank_mega = {
+				name = "Mega Voicebank Pack",
+				text = {
+					"Choose {C:attention}#1#{} of up to",
+					"{C:attention}#2#{V:1} Voicebank{} cards to take",
+				}
+			},
 			ba_bl_hook = {
 				text = {
 					"Retrigger {C:attention}2{} random cards",
@@ -989,7 +1026,8 @@ return {
 	misc = {
 		dictionary = {
 			k_voicebank = "Voicebank",
-			b_voicebank_cards = "Voicebanks"
+			b_voicebank_cards = "Voicebanks",
+			k_voicebank_pack = "Voicebank Pack"
 		},
 		labels = {
 			voicebank = "Voicebank",

@@ -18,7 +18,8 @@
 		"check_for_unlock",
 		"attention_text",
 		"mix_colors",
-		"sendDebugMessage"
+		"sendDebugMessage",
+		"Particles"
 	],
 	"Lua.workspace.library": ["C:\\Users\\foo54\\AppData\\Roaming\\Balatro\\Mods\\smods-1.0.0-beta-1503a", "C:/Users/foo54/AppData/Roaming/Balatro/Mods/lovely/dump"]
 }

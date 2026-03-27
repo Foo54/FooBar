@@ -206,3 +206,16 @@ function FooBar.take_ownership_expected_value (key, condition, num_table, dem_ta
 		loc_vars = FooBar.generate_average_probability_expected_value_loc_vars("j_" .. key, num_table, dem_table, fail, succeed, loc_vars_key, loc_vars_table),
 	}, true)
 end
+
+function FooBar.crypton_active()
+	if G.consumeables and G.consumeables.cards then
+		for _, card in ipairs(G.consumeables.cards) do
+			if card.config.center.key == "c_foobar_vb_crypton" then
+				if card.ability.immutable._active then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end

@@ -10,22 +10,24 @@ local function use_voicebank(_vb, card, area, copier, disable, enable)
 		SMODS.destroy_cards(card)
 		if disable then disable() end
 	else
-		local destroy = {}
-		for _, vb in ipairs(G.consumeables.cards) do
-			if vb.config.center.set == "Voicebank" then
-				if vb.ability.immutable._active then
-					table.insert(destroy, vb)
+		if not FooBar.crypton_active() then
+			local destroy = {}
+			for _, vb in ipairs(G.consumeables.cards) do
+				if vb.config.center.set == "Voicebank" then
+					if vb.ability.immutable._active then
+						table.insert(destroy, vb)
+					end
 				end
 			end
+			SMODS.destroy_cards(destroy)
+			card:set_edition("e_foobar_working")
 		end
-		SMODS.destroy_cards(destroy)
 		card.ability.immutable._active = true
-		card:set_edition("e_foobar_working")
 		if enable then enable() end
 	end
 end
 local function add_vb_info (info_queue)
-	info_queue[#info_queue + 1] = {set = "Other", key = "foobar_vb_info", vars = {colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour}}}
+	info_queue[#info_queue + 1] = {set = "Other", key = "foobar_vb_info" .. (FooBar.crypton_active() and "_crypton" or ""), vars = {colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour}}}
 end
 local function generate_active_status (active)
 	if not active then
@@ -42,6 +44,7 @@ SMODS.ConsumableType{
 	collection_rows = { 5, 5 },
 	shop_rate = 3,
 	default = "c_foobar_vb_defoko",
+	select_card = "consumeables",
 	inject_card = function(self, card)
 		card.can_use = card.can_use or function(self, card) return true end
 		card.keep_on_use = card.keep_on_use or function(self, card) return not card.ability.immutable._active end
@@ -65,6 +68,181 @@ SMODS.ConsumableType{
 	end
 }
 
+SMODS.Booster{
+	key = "voicebank_normal_1",
+	weight = 0.7,
+	kind = "Voicebank",
+	cost = 4,
+	pos = {x=0, y=4},
+	--atlas = "boosters",
+	group_key = "k_voicebank_pack",
+	config = {extra = 2, choose = 1},
+	loc_vars = function(self, info_queue, card)
+		local cfg = (card and card.ability) or self.config
+		return {
+			vars = { cfg.choose, cfg.extra, colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour}},
+			key = self.key:sub(1, -3), -- This uses the description key of the booster without the number at the end. Remove this if your booster doesn't have artwork variants like vanilla
+		}
+	end,
+	ease_background_colour = function(self)
+		ease_background_colour_blind(G.STATES.SPECTRAL_PACK)
+	end,
+	particles = function(self)
+		G.booster_pack_sparkles = Particles(1, 1, 0, 0, {
+			timer = 0.015,
+			scale = 0.1,
+			initialize = true,
+			lifespan = 3,
+			speed = 0.2,
+			padding = -1,
+			attach = G.ROOM_ATTACH,
+			colours = { G.C.WHITE, lighten(G.C.GOLD, 0.2) },
+			fill = true
+		})
+		G.booster_pack_sparkles.fade_alpha = 1
+		G.booster_pack_sparkles:fade(1, 0)
+	end,
+	create_card = function(self, card, i)
+		return {
+			set = "Voicebank",
+			area = G.pack_cards,
+			skip_materialize = true,
+			soulable = true,
+		}
+	end
+}
+
+SMODS.Booster{
+	key = "voicebank_normal_2",
+	weight = 0.7,
+	kind = "Voicebank",
+	cost = 4,
+	pos = {x=1, y=4},
+	--atlas = "boosters",
+	group_key = "k_voicebank_pack",
+	config = {extra = 2, choose = 1},
+	loc_vars = function(self, info_queue, card)
+		local cfg = (card and card.ability) or self.config
+		return {
+			vars = { cfg.choose, cfg.extra, colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour} },
+			key = self.key:sub(1, -3), -- This uses the description key of the booster without the number at the end. Remove this if your booster doesn't have artwork variants like vanilla
+		}
+	end,
+	ease_background_colour = function(self)
+		ease_background_colour_blind(G.STATES.SPECTRAL_PACK)
+	end,
+	particles = function(self)
+		G.booster_pack_sparkles = Particles(1, 1, 0, 0, {
+			timer = 0.015,
+			scale = 0.1,
+			initialize = true,
+			lifespan = 3,
+			speed = 0.2,
+			padding = -1,
+			attach = G.ROOM_ATTACH,
+			colours = { G.C.WHITE, lighten(G.C.GOLD, 0.2) },
+			fill = true
+		})
+		G.booster_pack_sparkles.fade_alpha = 1
+		G.booster_pack_sparkles:fade(1, 0)
+	end,
+	create_card = function(self, card, i)
+		return {
+			set = "Voicebank",
+			area = G.pack_cards,
+			skip_materialize = true,
+			soulable = true,
+		}
+	end
+}
+
+SMODS.Booster{
+	key = "voicebank_jumbo_1",
+	weight = 0.7,
+	kind = "Voicebank",
+	cost = 6,
+	pos = {x=2, y=4},
+	--atlas = "boosters",
+	group_key = "k_voicebank_pack",
+	config = {extra = 4, choose = 1},
+	loc_vars = function(self, info_queue, card)
+		local cfg = (card and card.ability) or self.config
+		return {
+			vars = { cfg.choose, cfg.extra, colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour} },
+			key = self.key:sub(1, -3), -- This uses the description key of the booster without the number at the end. Remove this if your booster doesn't have artwork variants like vanilla
+		}
+	end,
+	ease_background_colour = function(self)
+		ease_background_colour_blind(G.STATES.SPECTRAL_PACK)
+	end,
+	particles = function(self)
+		G.booster_pack_sparkles = Particles(1, 1, 0, 0, {
+			timer = 0.015,
+			scale = 0.1,
+			initialize = true,
+			lifespan = 3,
+			speed = 0.2,
+			padding = -1,
+			attach = G.ROOM_ATTACH,
+			colours = { G.C.WHITE, lighten(G.C.GOLD, 0.2) },
+			fill = true
+		})
+		G.booster_pack_sparkles.fade_alpha = 1
+		G.booster_pack_sparkles:fade(1, 0)
+	end,
+	create_card = function(self, card, i)
+		return {
+			set = "Voicebank",
+			area = G.pack_cards,
+			skip_materialize = true,
+			soulable = true,
+		}
+	end
+}
+
+SMODS.Booster{
+	key = "voicebank_mega_1",
+	weight = 0.1,
+	kind = "Voicebank",
+	cost = 8,
+	pos = {x=3, y=4},
+	--atlas = "boosters",
+	group_key = "k_voicebank_pack",
+	config = {extra = 4, choose = 2},
+	loc_vars = function(self, info_queue, card)
+		local cfg = (card and card.ability) or self.config
+		return {
+			vars = { cfg.choose, cfg.extra, colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour} },
+			key = self.key:sub(1, -3), -- This uses the description key of the booster without the number at the end. Remove this if your booster doesn't have artwork variants like vanilla
+		}
+	end,
+	ease_background_colour = function(self)
+		ease_background_colour_blind(G.STATES.SPECTRAL_PACK)
+	end,
+	particles = function(self)
+		G.booster_pack_sparkles = Particles(1, 1, 0, 0, {
+			timer = 0.015,
+			scale = 0.1,
+			initialize = true,
+			lifespan = 3,
+			speed = 0.2,
+			padding = -1,
+			attach = G.ROOM_ATTACH,
+			colours = { G.C.WHITE, lighten(G.C.GOLD, 0.2) },
+			fill = true
+		})
+		G.booster_pack_sparkles.fade_alpha = 1
+		G.booster_pack_sparkles:fade(1, 0)
+	end,
+	create_card = function(self, card, i)
+		return {
+			set = "Voicebank",
+			area = G.pack_cards,
+			skip_materialize = true,
+			soulable = true,
+		}
+	end
+}
 
 SMODS.Edition{
 	key = "working",
@@ -73,6 +251,32 @@ SMODS.Edition{
 	in_shop = false,
 	badge_colour = G.C.GREEN,
 	config = {card_limit = 1}
+}
+
+-- Crypton
+SMODS.Consumable{
+	key = "vb_crypton",
+	set = "Spectral",
+	atlas = "voicebanks",
+	pos = {x=1,y=4},
+	can_use = function(self, card) return true end,
+	use = use_voicebank,
+	pixel_size = {h = 66 + 20},
+	config = {
+		immutable = {
+			_active = false
+		}
+	},
+	soul_set = "Voicebank",
+	hidden = true,
+	keep_on_use = function(self, card) return not card.ability.immutable._active end,
+	loc_vars = function(self, info_queue, card)
+		add_vb_info(info_queue)
+		local main_end = generate_active_status(card.ability.immutable._active)
+		local ret = {vars = {colours = {SMODS.ConsumableTypes.Voicebank.secondary_colour}}}
+		if main_end then ret.main_end = ret.main_end or {main_end} end
+		return ret
+	end
 }
 
 -- MEIKO
