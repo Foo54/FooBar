@@ -38,7 +38,7 @@ SMODS.ConsumableType{
 	secondary_colour = HEX("F58727"),
 	collection_rows = { 5, 5, 5 },
 	shop_rate = 3,
-	default = "c_foobar_vb_meiko",
+	default = "c_foobar_vb_defoko",
 	inject_card = function(self, card)
 		card.can_use = card.can_use or function(self, card) return true end
 		card.keep_on_use = card.keep_on_use or function(self, card) return not card.ability.immutable._active end
@@ -107,7 +107,7 @@ SMODS.Consumable{
 				end
 			end
 			if context.debuff_card then
-				if not context.debuff_card:is_suit("Hearts") then
+				if context.debuff_card.config.center.set == "Default" and not context.debuff_card:is_suit("Hearts") then
 					local flag = false
 					if FooBar.average_probability() then
 						local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "meiko_debuff")
@@ -436,6 +436,230 @@ SMODS.Consumable{
 		if card.ability.immutable._active then
 			if context.before and G.GAME.current_round.hands_played == 0 and #context.full_hand > card.ability.extra.least then
 				context.full_hand[#context.full_hand]:set_edition("e_polychrome")
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	set = "Voicebank",
+	key = "vb_defoko",
+	atlas = "voicebanks",
+	pos = {x=0,y=2},
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.setting_blind and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+				local key = pseudorandom_element(SMODS.ConsumableTypes, "defoko_choice")
+				if key then
+					if key.default then
+						key = key.default
+					elseif key.key == "Planet" then
+						key = "c_pluto"
+					elseif key.key == "Spectral" then
+						key = "c_incantation"
+					elseif key.key == "Tarot" then
+						key = "c_strength"
+					else
+						key = G.P_CENTER_POOLS[key.key][1].key -- unknown default, grab the first item of its type created
+					end
+					G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+					G.E_MANAGER:add_event(Event({
+						func = function()
+							G.E_MANAGER:add_event(Event({
+								func = function()
+									SMODS.add_card{key=key}
+									G.GAME.consumeable_buffer = 0
+									return true
+								end
+							}))
+							SMODS.calculate_effect({ message = "+1", colour = G.C.PURPLE }, context.blueprint_card or card)
+							return true
+						end
+					}))
+					return nil, true -- This is for Joker retrigger purposes
+				end
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	set = "Voicebank",
+	key = "vb_rei",
+	atlas = "voicebanks",
+	pos = {x=1,y=2},
+	config = {
+		extra = {
+			chips_gain = 30
+		},
+		immutable = {
+			suit = "Diamonds"
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.immutable.suit, card.ability.extra.chips_gain}}
+	end,
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.before then
+				for _, _card in ipairs(context.scoring_hand) do
+					if _card:is_suit(card.ability.immutable.suit) then
+						SMODS.scale_card(_card, {
+							ref_table = _card.ability,
+							ref_value = "perma_bonus",
+							scalar_table = card.ability.extra,
+							scalar_value = "chips_gain"
+						})
+					end
+				end
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	set = "Voicebank",
+	key = "vb_yuki",
+	atlas = "voicebanks",
+	pos = {x=2,y=2},
+	config = {
+		extra = {
+			rank_decrease = 1
+		},
+		immutable = {
+			suit = "Spades"
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.immutable.suit, card.ability.extra.rank_decrease}}
+	end,
+	calculate = function (self, card, context)
+		if card.ability.immutable._active then
+			if context.before then
+				for i, _card in ipairs(context.scoring_hand) do
+					if _card:is_suit(card.ability.immutable.suit) then
+						local percent = 1.15 - (i - 0.999) / (#context.scoring_hand - 0.998) * 0.3
+            G.E_MANAGER:add_event(Event({
+							trigger = 'after',
+							delay = 0.15,
+							func = function()
+								context.scoring_hand[i]:flip()
+								play_sound('card1', percent)
+								context.scoring_hand[i]:juice_up(0.3, 0.3)
+								return true
+							end
+            }))
+						G.E_MANAGER:add_event(Event({
+							trigger = 'after',
+							delay = 0.3,
+							func = function()
+								-- SMODS.modify_rank will increment/decrement a given card's rank by a given amount
+								assert(SMODS.modify_rank(context.scoring_hand[i], -card.ability.extra.rank_decrease))
+								return true
+							end
+            }))
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.35,
+                func = function()
+                    context.scoring_hand[i]:flip()
+                    play_sound('tarot2', percent, 0.6)
+                    context.scoring_hand[i]:juice_up(0.3, 0.3)
+                    return true
+                end
+            }))
+						SMODS.scale_card(_card, {
+							ref_table = _card.ability,
+							ref_value = "perma_mult",
+							scalar_table = {val = _card:get_id()},
+							scalar_value = "val"
+						})
+					end
+				end
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	key = "vb_kafu",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=3,y=2},
+	calculate = function (self, card, context)
+		if card.ability.immutable._active then
+			if context.destroy_card then
+				if (context.cardarea == G.play or context.cardarea == "unscored") and G.GAME.current_round.hands_played == 0 then
+					return {
+						remove = true
+					}
+				end
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	key = "vb_flower",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=4,y=2},
+	config = {
+		extra = {
+			xmult_gain = 0.1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.xmult_gain}}
+	end,
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.before then
+				local suits = {
+					['Hearts'] = 0,
+					['Diamonds'] = 0,
+					['Spades'] = 0,
+					['Clubs'] = 0
+				}
+				for i = 1, #context.scoring_hand do
+					if not SMODS.has_any_suit(context.scoring_hand[i]) then
+						if context.scoring_hand[i]:is_suit('Hearts', true) and suits["Hearts"] == 0 then
+							suits["Hearts"] = suits["Hearts"] + 1
+						elseif context.scoring_hand[i]:is_suit('Diamonds', true) and suits["Diamonds"] == 0 then
+							suits["Diamonds"] = suits["Diamonds"] + 1
+						elseif context.scoring_hand[i]:is_suit('Spades', true) and suits["Spades"] == 0 then
+							suits["Spades"] = suits["Spades"] + 1
+						elseif context.scoring_hand[i]:is_suit('Clubs', true) and suits["Clubs"] == 0 then
+							suits["Clubs"] = suits["Clubs"] + 1
+						end
+					end
+				end
+				for i = 1, #context.scoring_hand do
+					if SMODS.has_any_suit(context.scoring_hand[i]) then
+						if context.scoring_hand[i]:is_suit('Hearts') and suits["Hearts"] == 0 then
+							suits["Hearts"] = suits["Hearts"] + 1
+						elseif context.scoring_hand[i]:is_suit('Diamonds') and suits["Diamonds"] == 0 then
+							suits["Diamonds"] = suits["Diamonds"] + 1
+						elseif context.scoring_hand[i]:is_suit('Spades') and suits["Spades"] == 0 then
+							suits["Spades"] = suits["Spades"] + 1
+						elseif context.scoring_hand[i]:is_suit('Clubs') and suits["Clubs"] == 0 then
+							suits["Clubs"] = suits["Clubs"] + 1
+						end
+					end
+				end
+				if suits["Hearts"] > 0 and
+					suits["Diamonds"] > 0 and
+					suits["Spades"] > 0 and
+					suits["Clubs"] > 0 then
+					for _, _card in ipairs(G.hand.cards) do
+						SMODS.scale_card(_card, {
+							ref_table = _card.ability,
+							ref_value = "perma_x_mult",
+							scalar_table = card.ability.extra,
+							scalar_value = "xmult_gain"
+						})
+					end
+				end
 			end
 		end
 	end

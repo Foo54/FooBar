@@ -693,6 +693,47 @@ return {
 					"contains more than {C:attention}#1#{} card",
 					"make the last card {C:dark_edition}Polychrome"
 				}
+			},
+			c_foobar_vb_defoko = {
+				name = "Utane Uta",
+				text = {
+					"Creates the {C:attention}default",
+					"card from a random",
+					"{C:attention}consumable type",
+					"when blind is {C:attention}selected"
+				}
+			},
+			c_foobar_vb_rei = {
+				name = "Adachi Rei",
+				text = {
+					"Scored {C:diamonds}#1#{} permanently gain",
+					"{C:chips}+#2#{} chips"
+				}
+			},
+			c_foobar_vb_yuki = {
+				name = "Kaai Yuki",
+				text = {
+					"Scored {C:spades}#1#{} decrease",
+					"their rank by {C:attention}#2#",
+					"and permanently gain {C:mult}their rank{} mult"
+				}
+			},
+			c_foobar_vb_kafu = {
+				name = "KAFU",
+				text = {
+					"{C:red}Destroy{} all cards in",
+					"{C:attention}first hand of round"
+				}
+			},
+			c_foobar_vb_flower = {
+				name = "Flower",
+				text = {
+					"Cards held in hand",
+					"permanently gain {X:mult,C:white}X#1#{} mult",
+					"if scored hand contains a",
+					"{C:diamonds}Diamond{} card, {C:clubs}Club{} card,",
+					"{C:hearts}Heart{} card, and {C:spades}Spade{} card"
+				}
 			}
 		},
 		Edition = {
