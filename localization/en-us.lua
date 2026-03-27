@@ -734,6 +734,27 @@ return {
 					"{C:diamonds}Diamond{} card, {C:clubs}Club{} card,",
 					"{C:hearts}Heart{} card, and {C:spades}Spade{} card"
 				}
+			},
+			c_foobar_vb_zundamon = {
+				name = "Zundamon",
+				text = {
+					"If played hand is a {C:attention}#1#",
+					"retrigger all cards"
+				}
+			},
+			c_foobar_vb_gumi = {
+				name = "GUMI",
+				text = {
+					"Retrigger all {C:attention}Kings{} and {C:attention}Queens",
+					"{C:green}#1# in #2#{} chance to retrigger a second time"
+				}
+			},
+			c_foobar_vb_gumi_simplex = {
+				name = "GUMI",
+				text = {
+					"Retrigger all {C:attention}Kings{} and {C:attention}Queens",
+					"{C:green}#1# of every #2#{} are retriggered a second time"
+				}
 			}
 		},
 		Edition = {

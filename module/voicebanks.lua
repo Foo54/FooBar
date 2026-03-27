@@ -36,7 +36,7 @@ SMODS.ConsumableType{
 	key = "Voicebank",
 	primary_colour = HEX("141414"),
 	secondary_colour = HEX("F58727"),
-	collection_rows = { 5, 5, 5 },
+	collection_rows = { 5, 5 },
 	shop_rate = 3,
 	default = "c_foobar_vb_defoko",
 	inject_card = function(self, card)
@@ -277,7 +277,7 @@ SMODS.Consumable{
 	config = {
 		extra = {
 			immutable = {
-				copy_key = nil
+				copy_key = "c_foobar_vb_defoko"
 			}
 		}
 	},
@@ -300,13 +300,13 @@ SMODS.Consumable{
 		end)
 	end,
 	calculate = function(self, card, context)
-		if card.ability.immutable._active then
-			if context.setting_blind then
-				while true do
+		if context.end_of_round and context.game_over == false and context.main_eval then
+			while true do
 					card.ability.immutable.copy_key = pseudorandom_element(G.P_CENTER_POOLS.Voicebank, "neru_choice").key
 					if card.ability.immutable.copy_key ~= card.config.center.key then break end
 				end
-			end
+		end
+		if card.ability.immutable._active then
 			if card.ability.immutable.copy_key then
 				local ref = G.P_CENTERS[card.ability.immutable.copy_key]:create_fake_card()
 				ref.ability.immutable._active = true
@@ -659,6 +659,89 @@ SMODS.Consumable{
 							scalar_value = "xmult_gain"
 						})
 					end
+				end
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	key = "vb_zundamon",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=0,y=3},
+	config = {
+		extra = {
+			poker_hand = "High Card"
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.poker_hand}}
+	end,
+	calculate = function(self, card, context)
+		if context.end_of_round and context.game_over == false and context.main_eval then
+			local _poker_hands = {}
+			for handname, _ in pairs(G.GAME.hands) do
+				if SMODS.is_poker_hand_visible(handname) and handname ~= card.ability.extra.poker_hand then
+					_poker_hands[#_poker_hands + 1] = handname
+				end
+			end
+			card.ability.extra.poker_hand = pseudorandom_element(_poker_hands, 'zundamon_choice')
+			if card.ability.immutable._active then
+				return {
+					message = localize('k_reset')
+				}
+			end
+		end
+		if card.ability.immutable._active then
+			if context.repetition then
+				if context.scoring_name == card.ability.extra.poker_hand then
+					return {
+						repetitions = 1
+					}
+				end
+			end
+		end
+	end
+}
+
+SMODS.Consumable{
+	key = "vb_gumi",
+	set = "Voicebank",
+	atlas = "voicebanks",
+	pos = {x=1, y=3},
+	config = {
+		extra = {
+			num = 1,
+			dem = 2
+		},
+		immutable = {
+			rank1 = 13,
+			rank2 = 12,
+			counter = 0
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "gumi_retrigger")
+		local ret = {vars = {num, dem}}
+		if FooBar.average_probability() then ret.key = self.key .. "_simplex" end
+		return ret
+	end,
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.repetition then
+				if context.other_card:get_id() == card.ability.immutable.rank1 or context.other_card:get_id() == card.ability.immutable.rank2 then
+					local flag = false
+					if FooBar.average_probability() then
+						local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "gumi_retrigger")
+						card.ability.immutable.counter = (card.ability.immutable.counter + 1) % dem
+						flag = card.ability.immutable.counter < num
+					else
+						flag = SMODS.pseudorandom_probability(card, "gumi_retrigger", card.ability.extra.num, card.ability.extra.dem)
+					end
+					return {
+						repetitions = flag and 2 or 1
+					}
 				end
 			end
 		end
