@@ -960,11 +960,9 @@ SMODS.Joker{
 			calc_function = function (card)
 				local mult = 0
 				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
-				if text ~= 'Unknown' then
-					for _, scoring_card in pairs(scoring_hand) do
-						if scoring_card.facing == "back" then
-							mult = mult + card.ability.extra.mult * JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
-						end
+				for _, scoring_card in pairs(scoring_hand) do
+					if scoring_card.facing == "back" then
+						mult = mult + card.ability.extra.mult * JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
 					end
 				end
 				card.joker_display_values.mult = mult
@@ -1416,14 +1414,14 @@ SMODS.Joker{
 		local card1 = "None"
 		local card2 = "None"
 		if card.ability.immutable.key1 then
-			local card = G.P_CENTERS[card.ability.immutable.key1]
-			info_queue[#info_queue+1] = card
-			card1 = card.name
+			local _card = G.P_CENTERS[card.ability.immutable.key1]
+			info_queue[#info_queue+1] = _card
+			card1 = localize{type="name_text", set = "Joker", key= card.ability.immutable.key1} or ("ERROR: " .. _card.key)
 		end
 		if card.ability.immutable.key2 then
-			local card = G.P_CENTERS[card.ability.immutable.key2]
-			info_queue[#info_queue+1] = card
-			card2 = card.name
+			local _card = G.P_CENTERS[card.ability.immutable.key2]
+			info_queue[#info_queue+1] = _card
+			card2 = localize{type="name_text", set = "Joker", key= card.ability.immutable.key2} or ("ERROR: " .. _card.key)
 		end
 		return {vars = {card.ability.immutable.copies, card1, card2}}
 	end,
@@ -1468,19 +1466,25 @@ SMODS.Joker{
 		return {
 			text = {
 				{ref_table = "card.joker_display_values", ref_value = "card1"},
-				{text = "&"},
+			},
+			reminder_text = {
 				{ref_table = "card.joker_display_values", ref_value = "card2"}
+			},
+			text_config = {
+				scale = 0.4
+			},
+			reminder_text_config = {
+				scale = 0.4,
+				colour = G.C.UI.TEXT_LIGHT
 			},
 			calc_function = function(card)
 				local card1 = "None"
 				local card2 = "None"
 				if card.ability.immutable.key1 then
-					local card = G.P_CENTERS[card.ability.immutable.key1]
-					card1 = card.name
+					card1 = localize{type="name_text", set = "Joker", key= card.ability.immutable.key1} or ("ERROR: " .. card.ability.immutable.key1)
 				end
 				if card.ability.immutable.key2 then
-					local card = G.P_CENTERS[card.ability.immutable.key2]
-					card2 = card.name
+					card2 = localize{type="name_text", set = "Joker", key= card.ability.immutable.key2} or ("ERROR: " .. card.ability.immutable.key2)
 				end
 				card.joker_display_values.card1 = card1
 				card.joker_display_values.card2 = card2

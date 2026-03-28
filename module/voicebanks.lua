@@ -84,8 +84,8 @@ SMODS.Booster{
 	weight = 0.7,
 	kind = "Voicebank",
 	cost = 4,
-	pos = {x=0, y=4},
-	--atlas = "boosters",
+	pos = {x=0, y=0},
+	atlas = "voicebanks",
 	group_key = "k_voicebank_pack",
 	config = {extra = 2, choose = 1},
 	loc_vars = function(self, info_queue, card)
@@ -128,8 +128,8 @@ SMODS.Booster{
 	weight = 0.7,
 	kind = "Voicebank",
 	cost = 4,
-	pos = {x=1, y=4},
-	--atlas = "boosters",
+	pos = {x=2, y=4},
+	atlas = "voicebanks",
 	group_key = "k_voicebank_pack",
 	config = {extra = 2, choose = 1},
 	loc_vars = function(self, info_queue, card)
@@ -172,8 +172,8 @@ SMODS.Booster{
 	weight = 0.7,
 	kind = "Voicebank",
 	cost = 6,
-	pos = {x=2, y=4},
-	--atlas = "boosters",
+	pos = {x=3, y=4},
+	atlas = "voicebanks",
 	group_key = "k_voicebank_pack",
 	config = {extra = 4, choose = 1},
 	loc_vars = function(self, info_queue, card)
@@ -216,8 +216,8 @@ SMODS.Booster{
 	weight = 0.1,
 	kind = "Voicebank",
 	cost = 8,
-	pos = {x=3, y=4},
-	--atlas = "boosters",
+	pos = {x=4, y=4},
+	atlas = "voicebanks",
 	group_key = "k_voicebank_pack",
 	config = {extra = 4, choose = 2},
 	loc_vars = function(self, info_queue, card)
@@ -1108,7 +1108,38 @@ SMODS.Consumable{
 	key = "vb_ia",
 	set = "Voicebank",
 	atlas = "voicebanks",
+	config = {
+		extra = {
+			chips_gain = 5,
+			mult_gain = 1
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.chips_gain, card.ability.extra.mult_gain}}
+	end,
 	pos = {x=4,y=3},
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.before then
+				for _, _card in ipairs(context.scoring_hand) do
+					if _card:get_id() == 14 then
+						SMODS.scale_card(card, {
+							ref_table = _card.ability,
+							ref_value = "perma_bonus",
+							scalar_table = card.ability.extra,
+							scalar_value = "chips_gain"
+						})
+						SMODS.scale_card(card, {
+							ref_table = _card.ability,
+							ref_value = "perma_mult",
+							scalar_table = card.ability.extra,
+							scalar_value = "mult_gain"
+						})
+					end
+				end
+			end
+		end
+	end
 }
 
 -- Forte

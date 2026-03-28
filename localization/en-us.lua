@@ -794,7 +794,8 @@ return {
 			c_foobar_vb_ia = {
 				name = "IA",
 				text = {
-					"something with aces"
+					"Scored {C:attention}Aces{} permanently gain",
+					"{C:chips}+#1#{} chips and {C:mult}+#2#{} mult"
 				}
 			},
 			c_foobar_vb_forte = {
