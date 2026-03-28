@@ -37,6 +37,8 @@ end
 print("Foobar | Loading crossmod.lua")
 assert(SMODS.load_file("module/priority/crossmod.lua"))()
 
+---@diagnostic disable-next-line: duplicate-set-field
 SMODS.current_mod.description_loc_vars = function()
     return { background_colour = G.C.CLEAR, text_colour = G.C.WHITE, scale = 1.2 }
 end
+

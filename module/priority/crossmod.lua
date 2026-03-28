@@ -5,6 +5,7 @@
 
 local basecrossmod = {
 	next(SMODS.find_mod('aikoyorisshenanigans')) and 'aikoshen.lua',
+	next(SMODS.find_mod('JokerDisplay')) and 'jokerdisplay.lua',
 }
 
 -- If none of these are valid, stop here.

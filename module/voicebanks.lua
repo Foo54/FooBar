@@ -946,7 +946,7 @@ SMODS.Consumable{
 	config = {
 		extra = {
 			num = 1,
-			dem = 2
+			dem = 10
 		},
 		immutable = {
 			rank1 = 13,
@@ -962,19 +962,26 @@ SMODS.Consumable{
 	end,
 	calculate = function(self, card, context)
 		if card.ability.immutable._active then
-			if context.repetition then
-				if context.other_card:get_id() == card.ability.immutable.rank1 or context.other_card:get_id() == card.ability.immutable.rank2 then
-					local flag = false
-					if FooBar.average_probability() then
-						local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "gumi_retrigger")
-						card.ability.immutable.counter = (card.ability.immutable.counter + 1) % dem
-						flag = card.ability.immutable.counter < num
-					else
-						flag = SMODS.pseudorandom_probability(card, "gumi_retrigger", card.ability.extra.num, card.ability.extra.dem)
+			if context.before then
+				for _, _card in ipairs(context.scoring_hand) do
+					if _card:get_id() == card.ability.immutable.rank1 or _card:get_id() == card.ability.immutable.rank2 then
+						local flag = false
+						if FooBar.average_probability() then
+							local num, dem = SMODS.get_probability_vars(card, card.ability.extra.num, card.ability.extra.dem, "gumi_retrigger")
+							card.ability.immutable.counter = (card.ability.immutable.counter + 1) % dem
+							flag = card.ability.immutable.counter < num
+						else
+							flag = SMODS.pseudorandom_probability(card, "gumi_retrigger", card.ability.extra.num, card.ability.extra.dem)
+						end
+						if flag then
+							SMODS.scale_card(card, {
+								ref_table = _card.ability,
+								ref_value = "perma_repetitions",
+								scalar_table = {1},
+								scalar_value = 1
+							})
+						end
 					end
-					return {
-						repetitions = flag and 2 or 1
-					}
 				end
 			end
 		end
@@ -986,7 +993,57 @@ SMODS.Consumable{
 	key = "vb_una",
 	set = "Voicebank",
 	atlas = "voicebanks",
-	pos = {x=2,y=3}
+	pos = {x=2,y=3},
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.after then
+				for i, _card in ipairs(context.scoring_hand) do
+					local percent = 1.15 - (i - 0.999) / (#context.scoring_hand - 0.998) * 0.3
+					G.E_MANAGER:add_event(Event({
+						trigger = 'after',
+						delay = 0.15,
+						func = function()
+							_card:flip()
+							play_sound('card1', percent)
+							_card:juice_up(0.3, 0.3)
+							return true
+						end
+					}))
+				end
+				delay(0.2)
+				for _, _card in ipairs(context.scoring_hand) do
+					G.E_MANAGER:add_event(Event({
+						trigger = 'after',
+						delay = 0.1,
+						func = function()
+							local old_id = _card:get_id()
+							assert(SMODS.change_base(_card, nil, pseudorandom_element(SMODS.Ranks, pseudoseed("una_choice")).key))
+							SMODS.scale_card(card, {
+								ref_table = _card.ability,
+								ref_value = "perma_h_mult",
+								scalar_table = {math.abs(_card:get_id() - old_id)},
+								scalar_value = 1
+							})
+							return true
+						end
+					}))
+				end
+				for i, _card in ipairs(context.scoring_hand) do
+					local percent = 0.85 + (i - 0.999) / (#context.scoring_hand - 0.998) * 0.3
+					G.E_MANAGER:add_event(Event({
+						trigger = 'after',
+						delay = 0.15,
+						func = function()
+							_card:flip()
+							play_sound('tarot2', percent, 0.6)
+							_card:juice_up(0.3, 0.3)
+							return true
+						end
+					}))
+				end
+			end
+		end
+	end
 }
 
 -- Yi Xi
@@ -1051,7 +1108,7 @@ SMODS.Consumable{
 	key = "vb_ia",
 	set = "Voicebank",
 	atlas = "voicebanks",
-	pos = {x=4,y=3}
+	pos = {x=4,y=3},
 }
 
 -- Forte
@@ -1059,7 +1116,23 @@ SMODS.Consumable{
 	key = "vb_forte",
 	set = "Voicebank",
 	atlas = "voicebanks",
-	pos = {x=0,y=4}
+	pos = {x=0,y=4},
+	calculate = function(self, card, context)
+		if card.ability.immutable._active then
+			if context.before then
+				for _, _card in ipairs(context.full_hand) do
+					if not SMODS.in_scoring(_card, context.scoring_hand) then
+						SMODS.scale_card(card, {
+							ref_table = _card.ability,
+							ref_value = "perma_bonus",
+							scalar_table = {_card:get_id()},
+							scalar_value = 1
+						})
+					end
+				end
+			end
+		end
+	end
 }
 
 

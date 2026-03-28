@@ -723,7 +723,7 @@ return {
 				text = {
 					"Scored {C:spades}#1#{} decrease",
 					"their rank by {C:attention}#2#",
-					"and permanently gain {C:mult}their rank{} mult"
+					"and permanently gain {C:attenion}their rank{} in {C:mult}mult"
 				}
 			},
 			c_foobar_vb_kafu = {
@@ -753,21 +753,26 @@ return {
 			c_foobar_vb_gumi = {
 				name = "GUMI",
 				text = {
-					"Retrigger all {C:attention}Kings{} and {C:attention}Queens",
-					"{C:green}#1# in #2#{} chance to retrigger a second time"
+					"played {C:attention}Kings{} and {C:attention}Queens{} have a",
+					"{C:green}#1# in #2#{} chance to",
+					"permanently gain a retrigger"
 				}
 			},
 			c_foobar_vb_gumi_simplex = {
 				name = "GUMI",
 				text = {
-					"Retrigger all {C:attention}Kings{} and {C:attention}Queens",
-					"{C:green}#1# of every #2#{} are retriggered a second time"
+					"{C:green}#1# of every #2#{} scored",
+					"{C:attention}King{} or {C:attention}Queen",
+					"permanently gains a retrigger"
 				}
 			},
 			c_foobar_vb_una = {
 				name = "Otomachi Una",
 				text = {
-					"idk yet"
+					"{C:attention}Randomized{} scored cards {C:attention}rank{} after scoring",
+					"Scored cards permanently gain",
+					"the difference between ranks in {C:mult}mult",
+					"when {C:attention}held in hand"
 				}
 			},
 			c_foobar_vb_yixi = {
@@ -789,13 +794,14 @@ return {
 			c_foobar_vb_ia = {
 				name = "IA",
 				text = {
-					"idk yet"
+					"something with aces"
 				}
 			},
 			c_foobar_vb_forte = {
 				name = "Eleanor Forte",
 				text = {
-					"idk yet"
+					"Unscored cards permanently gain",
+					"{C:attention}their rank{} in {C:chips}chips"
 				}
 			},
 		},

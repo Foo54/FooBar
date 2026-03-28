@@ -21,5 +21,9 @@
 		"sendDebugMessage",
 		"Particles"
 	],
-	"Lua.workspace.library": ["C:\\Users\\foo54\\AppData\\Roaming\\Balatro\\Mods\\smods-1.0.0-beta-1503a", "C:/Users/foo54/AppData/Roaming/Balatro/Mods/lovely/dump"]
+	"Lua.workspace.library": [
+		"C:\\Users\\foo54\\AppData\\Roaming\\Balatro\\Mods\\smods-1.0.0-beta-1503a",
+		"C:\\Users\\foo54\\AppData\\Roaming\\Balatro\\Mods\\JokerDisplay-1.9.6",
+		"C:/Users/foo54/AppData/Roaming/Balatro/Mods/lovely/dump",
+	]
 }

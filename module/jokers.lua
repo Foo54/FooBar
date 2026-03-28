@@ -63,6 +63,19 @@ SMODS.Joker{
 				Xmult = card.ability.extra.mult
 			}
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{
+					border_nodes = {
+						{text = "X"},
+						{ref_table = "card.ability.extra", ref_value = "mult", retrigger_type = "exp"}
+					}
+				}
+			}
+		}
 	end
 }
 
@@ -84,7 +97,7 @@ SMODS.Joker{
 	},
 	loc_vars = function(self, info_queue, card)
 		local num, dem = SMODS.get_probability_vars(card, card.ability.extra.numerator, card.ability.extra.denominator, "foobar_ena")
-		ret = {key = "j_foobar_enashinonome", vars = {num, dem, card.ability.immutable.count + 1}}
+		local ret = {key = "j_foobar_enashinonome", vars = {num, dem, card.ability.immutable.count + 1}}
 		if FooBar.average_probability() then
 			ret.key = ret.key .. "_simplex"
 		end
@@ -160,6 +173,26 @@ SMODS.Joker{
 				}
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.joker_display_values", ref_value = "chips", retrigger_type = "mult"}
+			},
+			text_config = {colour = G.C.CHIPS},
+			calc_function = function (card)
+				local chips = 0
+				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+				if text ~= 'Unknown' then
+					for _, scoring_card in pairs(scoring_hand) do
+						chips = chips + card.ability.extra.chips * JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
+					end
+				end
+				card.joker_display_values.chips = chips
+			end
+		}
 	end
 }
 
@@ -215,6 +248,33 @@ SMODS.Joker{
 				chips = card.ability.extra.chips
 			}
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.joker_display_values", ref_value = "chips", retrigger_type = "mult"},
+				{ref_table = "card.joker_display_values", ref_value = "arrow", colour = G.C.UI.TEXT_LIGHT},
+				{ref_table = "card.joker_display_values", ref_value = "new_chips"}
+			},
+			text_config = {colour = G.C.CHIPS},
+			calc_function = function (card)
+				card.joker_display_values.arrow = ""
+				card.joker_display_values.new_chips = ""
+				card.joker_display_values.chips = card.ability.extra.chips
+				if G.STATE == G.STATES.SHOP then
+					if not card.ability.immutable.safe then
+						card.joker_display_values.arrow = " -> "
+						card.joker_display_values.new_chips = "+0"
+					end
+				end
+				if G.STATE == G.STATES.BLIND_SELECT then
+					card.joker_display_values.arrow = " -> "
+					card.joker_display_values.new_chips = "+" .. (card.ability.extra.chips + card.ability.extra.inc)
+				end
+			end
+		}
 	end
 }
 
@@ -243,6 +303,26 @@ SMODS.Joker{
 				}
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{ text = "+$"},
+				{ ref_table = "card.joker_display_values", ref_value = "dollars", retrigger_type = "mult" },
+			},
+			text_config = {colour = G.C.MONEY},
+			calc_function = function (card)
+				card.joker_display_values.dollars = 0
+				if G.GAME.blind and G.GAME.blind.in_blind then
+					if G.hand then
+						if #G.hand.cards - #G.hand.highlighted > 0 then
+							card.joker_display_values.dollars = card.ability.extra.money
+						end
+					end
+				end
+			end
+		}
 	end
 }
 
@@ -280,6 +360,19 @@ SMODS.Joker{
 			}
 		end
 	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.joker_display_values", ref_value = "mult", retrigger_type = "mult"}
+			},
+			text_config = {G.C.MULT},
+			calc_function = function (card)
+				card.joker_display_values.mult = card.sell_cost * card.ability.extra.scale
+			end
+		}
+	end
 }
 
 --- Nothing
@@ -320,8 +413,20 @@ SMODS.Joker{
 				})
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{
+					border_nodes = {
+						{text = "X"},
+						{ref_table = "card.ability.extra", ref_value = "mult", retrigger_type = "exp"}
+					}
+				}
+			}
+		}
 	end
-			
 }
 
 --- Lost Media
@@ -331,7 +436,7 @@ SMODS.Joker{
 	pos = {x=6,y=0},
 	rarity = 2,
 	cost = 6,
-	pools = {["Song"] = true, ["MonochroMenace"] = true},
+	pools = {["Song"] = true},
 	config = {
 		extra = {
 			inc = 1
@@ -419,6 +524,31 @@ SMODS.Joker{
 				dollars = card.ability.extra.money_scale * #songs
 			}
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{
+					border_nodes = {
+						{text = "X"},
+						{ref_table = "card.joker_display_values", ref_value = "clout", retrigger_type = "exp"}
+					}
+				},
+				{text = ", "},
+				{text = "+$", colour = G.C.MONEY},
+				{ref_table = "card.joker_display_values", ref_value = "ad_revenue", retrigger_type = "mult", colour = G.C.MONEY}
+			},
+			reminder_text = {
+				{text = "(Hand, Round)"}
+			},
+			calc_function = function (card)
+				local producers = FooBar.filter_by_pool(G.jokers.cards or {}, "Producer")
+				local songs = FooBar.filter_by_pool(G.jokers.cards or {}, "Song")
+				card.joker_display_values.clout = #producers * card.ability.extra.mult_scale
+				card.joker_display_values.ad_revenue = #songs * card.ability.extra.money_scale
+			end
+		}
 	end
 }
 
@@ -435,7 +565,7 @@ SMODS.Joker{
 			timer = 3
 		}
 	},
-	pools = {["Tanger"] = true, ["Song"] = true},
+	pools = {["Song"] = true},
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.mult, card.ability.extra.timer}}
 	end,
@@ -466,6 +596,19 @@ SMODS.Joker{
 				}
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{
+					border_nodes = {
+						{text = "X"},
+						{ref_table = "card.ability.extra", ref_value = "mult", retrigger_type="exp"}
+					}
+				}
+			}
+		}
 	end
 }
 
@@ -476,7 +619,7 @@ SMODS.Joker{
 	pos = {x=2,y=0},
 	rarity = 3,
 	cost = 10,
-	pools = {["Producer"] = true, ["MonochroMenace"] = true},
+	pools = {["Producer"] = true},
 	loc_vars = function(self, info_queue, card)
 		for i, seal in ipairs({"Purple", "Gold", "Blue", "Red"}) do
 			info_queue[#info_queue + 1] = G.P_SEALS[seal]
@@ -550,6 +693,33 @@ SMODS.Joker{
 				}
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.joker_display_values", ref_value = "mult", retrigger_type = "mult"}
+			},
+
+			text_config = {colour = G.C.MULT},
+			calc_function = function (card)
+				card.joker_display_values.mult = card.ability.extra.mult
+				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+				if text ~= "Unknown" then
+					local faces = false
+					for _, playing_card in ipairs(scoring_hand) do
+						if playing_card:is_face() then
+							faces = true
+							break
+						end
+					end
+					if not faces then
+						card.joker_display_values.mult = math.max(0, card.ability.extra.mult - card.ability.extra.scaling)
+					end
+				end
+			end
+		}
 	end
 }
 
@@ -564,7 +734,6 @@ SMODS.Joker{
 		}
 	},
 	pos = {x = 0, y = 0},
-	pools = {["Glat"] = true, ["Discord"] = true},
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.scaling, G.GAME.starting_deck_size, card.ability.extra.scaling * math.max(0, (G.playing_cards and (#G.playing_cards - G.GAME.starting_deck_size) or 0))}}
 	end,
@@ -574,6 +743,19 @@ SMODS.Joker{
 				chips = card.ability.extra.scaling * math.max(0, (G.playing_cards and (#G.playing_cards - G.GAME.starting_deck_size) or 0))
 			}
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.joker_display_values", ref_value = "67", retrigger_type = "mult"}
+			},
+			text_config = {colour = G.C.CHIPS},
+			calc_function = function (card)
+				card.joker_display_values["67"] = card.ability.extra.scaling * math.max(0, (G.playing_cards and (#G.playing_cards - G.GAME.starting_deck_size) or 0))
+			end
+		}
 	end
 }
 
@@ -633,6 +815,33 @@ SMODS.Joker{
 		if card.ability and card.ability.immutable and card.ability.immutable.rounds > 0 then
 			card.children.center:set_sprite_pos({x = 3 + 4 - card.ability.immutable.rounds, y = 1})
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+$"},
+				{ref_table = "card.joker_display_values", ref_value = "money", retrigger_type = "mult"}
+			},
+			reminder_text = {
+				{text = "("},
+				{text = "Face Cards", colour = G.C.ORANGE},
+				{text = ")"}
+			},
+			text_config = {colour = G.C.MONEY},
+			calc_function = function (card)
+				local money = 0
+				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+				if text ~= 'Unknown' then
+					for _, scoring_card in pairs(scoring_hand) do
+						if scoring_card:is_face() then
+							money = money + card.ability.extra.money * JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
+						end
+					end
+				end
+				card.joker_display_values.money = money
+			end
+		}
 	end
 }
 
@@ -665,6 +874,14 @@ SMODS.Joker{
 	end,
 	calc_dollar_bonus = function(self, card)
 		return card.ability.extra.money
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "nic"}
+			}
+		}
 	end
 }
 
@@ -728,6 +945,31 @@ SMODS.Joker{
 				}
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.joker_display_values", ref_value = "mult", retrigger_type = "mult"}
+			},
+			reminder_text = {
+				{text = "(Face down)"}
+			},
+			text_config = {colour = G.C.MULT},
+			calc_function = function (card)
+				local mult = 0
+				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+				if text ~= 'Unknown' then
+					for _, scoring_card in pairs(scoring_hand) do
+						if scoring_card.facing == "back" then
+							mult = mult + card.ability.extra.mult * JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
+						end
+					end
+				end
+				card.joker_display_values.mult = mult
+			end
+		}
 	end
 }
 
@@ -778,6 +1020,16 @@ SMODS.Joker{
 				chips = card.ability.extra.chips
 			}
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.ability.extra", ref_value = "chips", retrigger_type = "mult"}
+			},
+			text_config = {colour = G.C.CHIPS}
+		}
 	end
 }
 
@@ -916,12 +1168,41 @@ SMODS.Joker{
 	end,
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			if context.other_card:is_suit("Hearts") or context.other_card:get_id() == 4 or context.other_card:get_id() == 14 then
+			if context.other_card:get_id() == 4 or context.other_card:get_id() == 14 then
 				return {
 					xchips = card.ability.extra.chips
 				}
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{
+					border_nodes = {
+						{text = "X"},
+						{ref_table = "card.joker_display_values", ref_value = "xchips", retrigger_type = "exp"}
+					},
+					border_colour = G.C.CHIPS
+				}
+			},
+			reminder_text = {
+				{text = "(4's and Aces)"}
+			},
+			calc_function = function (card)
+				local xchips = 0
+				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+				if text ~= 'Unknown' then
+					for _, scoring_card in pairs(scoring_hand) do
+						if scoring_card:get_id() == 4 or scoring_card:get_id() == 14 then
+							xchips = xchips * card.ability.extra.xchips ^ JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
+						end
+					end
+				end
+				card.joker_display_values.xchips = xchips
+			end
+		}
 	end
 }
 
@@ -984,7 +1265,7 @@ SMODS.Joker{
 			scaling = 3
 		}
 	},
-	pools = {["Song"] = true, ["MonochroMenace"] = true},
+	pools = {["Song"] = true},
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.mult, card.ability.extra.scaling}}
 	end,
@@ -1007,10 +1288,33 @@ SMODS.Joker{
 				mult = card.ability.extra.mult
 			}
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+"},
+				{ref_table = "card.joker_display_values", ref_value = "mult"}
+			},
+			reminder_text = {
+				{text = "(Wild Ace of Spades)"}
+			},
+			text_config = {colour = G.C.MULT},
+			calc_function = function (card)
+				local mult = card.ability.extra.mult
+				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+				if text ~= 'Unknown' then
+					for _, scoring_card in pairs(scoring_hand) do
+						if scoring_card:get_id() == 14 and scoring_card.base.suit == "Spades" and SMODS.has_enhancement(scoring_card, "m_wild") then
+							mult = mult + card.ability.extra.scaling
+						end
+					end
+				end
+				card.joker_display_values.mult = mult
+			end
+		}
 	end
 }
-
-
 
 --- HITO Mania
 SMODS.Joker{
@@ -1026,7 +1330,7 @@ SMODS.Joker{
 			max_chips = 60
 		}
 	},
-	pools = {["Song"] = true, ["Haraguchi"] = true},
+	pools = {["Song"] = true},
 	loc_vars = function(self, info_queue, card)
 		return {vars = {card.ability.extra.min_mult, card.ability.extra.max_mult, card.ability.extra.min_chips, card.ability.extra.max_chips}}
 	end,
@@ -1047,6 +1351,49 @@ SMODS.Joker{
 				}
 			end
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{text = "+", colour = G.C.CHIPS},
+				{ref_table = "card.joker_display_values", ref_value = "min_chips", retrigger_type = "mult", colour = G.C.CHIPS},
+				{text = " - ", colour = G.C.CHIPS},
+				{ref_table = "card.joker_display_values", ref_value = "max_chips", retrigger_type = "mult", colour = G.C.CHIPS},
+				{text = ", "},
+				{text = "+", colour = G.C.MULT},
+				{ref_table = "card.joker_display_values", ref_value = "min_mult", retrigger_type = "mult", colour = G.C.MULT},
+				{text = " - ", colour = G.C.MULT},
+				{ref_table = "card.joker_display_values", ref_value = "max_mult", retrigger_type = "mult", colour = G.C.MULT}
+			},
+			reminder_text = {
+				{text = "("},
+				{text = "Face Cards", colour = G.C.ORANGE},
+				{text = ")"}
+			},
+			calc_function = function (card)
+				local min_chips = 0
+				local max_chips = 0
+				local min_mult = 0
+				local max_mult = 0
+				local text, _, scoring_hand = JokerDisplay.evaluate_hand()
+				if text ~= 'Unknown' then
+					for _, scoring_card in pairs(scoring_hand) do
+						if scoring_card:is_face() then
+							local n = JokerDisplay.calculate_card_triggers(scoring_card, scoring_hand)
+							min_chips = min_chips + card.ability.extra.min_chips * n
+							max_chips = max_chips + card.ability.extra.max_chips * n
+							min_mult = min_mult + card.ability.extra.min_mult * n
+							max_mult = max_mult + card.ability.extra.max_mult * n
+						end
+					end
+				end
+				card.joker_display_values.min_chips = min_chips
+				card.joker_display_values.max_chips = max_chips
+				card.joker_display_values.min_mult = min_mult
+				card.joker_display_values.max_mult = max_mult
+			end
+		}
 	end
 }
 
@@ -1115,6 +1462,30 @@ SMODS.Joker{
 			if ret then ret.color = G.C.ORANGE end
 			return ret
 		end
+	end,
+	joker_display_def = function(JokerDisplay)
+		---@type JDJokerDefinition
+		return {
+			text = {
+				{ref_table = "card.joker_display_values", ref_value = "card1"},
+				{text = "&"},
+				{ref_table = "card.joker_display_values", ref_value = "card2"}
+			},
+			calc_function = function(card)
+				local card1 = "None"
+				local card2 = "None"
+				if card.ability.immutable.key1 then
+					local card = G.P_CENTERS[card.ability.immutable.key1]
+					card1 = card.name
+				end
+				if card.ability.immutable.key2 then
+					local card = G.P_CENTERS[card.ability.immutable.key2]
+					card2 = card.name
+				end
+				card.joker_display_values.card1 = card1
+				card.joker_display_values.card2 = card2
+			end
+		}
 	end
 }
 
