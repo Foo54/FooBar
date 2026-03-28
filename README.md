@@ -2,7 +2,7 @@
 balatro mod made by foo54
 
 # Additions
-- 27 New Jokers!
+- 29 New Jokers!
   - 1 Aikoyori's crossmod joker
 - 2 New Tarots!
 - 2 New Spectrals!
