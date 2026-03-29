@@ -1323,9 +1323,9 @@ SMODS.Joker{
 	config = {
 		extra = {
 			min_mult = 1,
-			max_mult = 10,
+			max_mult = 5,
 			min_chips = 1,
-			max_chips = 60
+			max_chips = 30
 		}
 	},
 	pools = {["Song"] = true},
