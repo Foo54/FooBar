@@ -161,3 +161,52 @@ pattern = '''if (not self.OVERLAY_MENU) or (not self.F_HIDE_BG) then '''
 position = "at"
 payload = '''if ((not self.OVERLAY_MENU) or (not self.F_HIDE_BG)) and not (self.GAME and self.GAME.FOOBAR_MINIGAME) then '''
 match_indent = true
+
+# allow main_end to work with decks in loc_vars
+[[patches]]
+[patches.pattern]
+target = 'back.lua'
+pattern = '''    local loc_args, loc_nodes = nil, {}'''
+position = "after"
+payload = '''local main_end = {}'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'back.lua'
+pattern = '''        	local res = back_config:locked_loc_vars() or {}'''
+position = "after"
+payload = '''main_end = res.main_end or {}'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'back.lua'
+pattern = '''        	local res = back_config:loc_vars() or {}'''
+position = "after"
+payload = '''main_end = res.main_end or {}'''
+match_indent = true
+
+[[patches]]
+[patches.pattern]
+target = 'back.lua'
+pattern = '''return 
+    {n=G.UIT.ROOT, config={align = "cm", minw = min_dims*5, minh = min_dims*2.5, id = self.name, colour = G.C.CLEAR}, nodes={
+        name_to_check == 'Challenge Deck' and UIBox_button({button = 'deck_view_challenge', label = {localize(challenge.id, 'challenge_names')},  minw = 2.2, minh = 1, scale = 0.6, id = challenge})
+        or desc_from_rows(loc_nodes, true, min_dims*5)
+    }}'''
+position = "at"
+payload = '''local ret = {n=G.UIT.ROOT, config={align = "cm", minw = min_dims*5, minh = min_dims*2.5, id = self.name, colour = G.C.CLEAR}, nodes={}}
+if name_to_check == 'Challenge Deck' then ret.nodes[1] = UIBox_button({button = 'deck_view_challenge', label = {localize(challenge.id, 'challenge_names')},  minw = 2.2, minh = 1, scale = 0.6, id = challenge})
+else
+  ret.nodes[1] = desc_from_rows(loc_nodes, true, min_dims*5)
+  for _, node in ipairs(main_end) do
+    ret.nodes[#ret.nodes + 1] = node
+  end
+end
+return ret'''
+match_indent = true
+
+
+
+

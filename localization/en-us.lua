@@ -524,6 +524,14 @@ return {
 					"for the first time this run,",
 					"gain a permanent ability"
 				}
+			},
+			b_foobar_custom = {
+				name = "Custom Deck",
+				text = {
+					"Spend points to",
+					"customize your deck",
+					"before starting a run"
+				}
 			}
 		},
 		Sleeve = {

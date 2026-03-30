@@ -1,10 +1,3 @@
---- TO ADD
---- Otomachi Una
---- Yi Xi
---- IA
---- Eleanor Forte
-
-
 local function use_voicebank(_vb, card, area, copier, disable, enable)
 	if card.ability.immutable._active then
 		SMODS.destroy_cards(card)
