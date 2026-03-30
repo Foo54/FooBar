@@ -11,7 +11,21 @@ end
 
 local card_click_ref = Card.click
 function Card:click()
+	if self.foobar_create_deck_card then
+		for _, cardarea in pairs(G.foobar_create_deck_suit_cardareas) do
+			if cardarea ~= self.area or not self.highlighted then
+				cardarea:unhighlight_all()
+			end
+		end
+	end
 	card_click_ref(self)
+	if self.foobar_create_deck_card then
+		if self.highlighted then
+			FooBar.update_selected_card(self)
+		else
+			FooBar.update_selected_card()
+		end
+	end
 	if not self.greyed then
 		if self.foobar_reference then
 			local j = SMODS.find_card("j_foobar_whiplash")[1]

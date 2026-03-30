@@ -15,15 +15,24 @@ SMODS.Back({
 })
 
 function G.FUNCS.foobar_open_edit_deck (e)
+	G.foobar_create_deck_selected_card = nil
 	if not G.foobar_create_deck_points then
 		G.foobar_create_deck_points = 1000
+	end
+	if not G.foobar_create_deck_selected_card_cardarea then
+		G.foobar_create_deck_selected_card_cardarea = CardArea(-5, -5, G.CARD_W, G.CARD_H, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 0
+		})
 	end
 	if not G.foobar_create_deck_suit_cardareas then
 		G.foobar_create_deck_suit_cardareas = {}
 	end
 	if not G.foobar_create_deck_cardarea then
 		G.foobar_create_deck_cardarea = CardArea(
-			0, 0, G.CARD_W, G.CARD_H,
+			-5, -5, G.CARD_W, G.CARD_H,
 			{
 				card_limit = 0,
 				type = 'title',
@@ -39,19 +48,36 @@ function G.FUNCS.foobar_open_edit_deck (e)
 		for _, rank in ipairs(SMODS.Rank.obj_buffer) do
 			for _, suit in ipairs(SMODS.Suit.obj_buffer) do
 				for _ = 1, 2 do
-					-- hacky solution to set the card scale
-					local card = SMODS.create_card({set = "Base", area = G.foobar_create_deck_cardarea, rank = rank, suit = suit, scale = 0.7})
-					G.playing_card = (G.playing_card and G.playing_card + 1) or 1
-					local _card = copy_card(card, nil, 0.7, G.playing_card)
-					G.foobar_create_deck[#G.foobar_create_deck + 1] = copy_card(card, nil, 0.7, G.playing_card)
-					card:remove()
-					G.foobar_create_deck_cardarea:emplace(_card)
-					_card:remove()
+					FooBar.create_deck_card(rank, suit)
 				end
 			end
 		end
 	end
 	G.FUNCS.overlay_menu({definition=G.UIDEF.foobar_edit_deck_ui()})
+end
+
+function FooBar.update_selected_card(card)
+	if G.OVERLAY_MENU then
+		local e = G.OVERLAY_MENU:get_UIE_by_ID("selected_card")
+		G.foobar_create_deck_selected_card = card
+		if G.foobar_create_deck_selected_card_cardarea.cards and G.foobar_create_deck_selected_card_cardarea.cards[1] then
+			G.foobar_create_deck_selected_card_cardarea:remove_card(G.foobar_create_deck_selected_card_cardarea.cards[1])
+		end
+		if card then
+			G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(card))
+		end
+	end
+end
+
+function FooBar.create_deck_card(rank, suit)
+	local card = SMODS.create_card({set = "Base", area = G.foobar_create_deck_cardarea, rank = rank, suit = suit, scale = 0.7})
+	G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+	local _card = copy_card(card, nil, 0.7, G.playing_card)
+	G.foobar_create_deck[#G.foobar_create_deck + 1] = copy_card(card, nil, 0.7, G.playing_card)
+	card:remove()
+	G.foobar_create_deck_cardarea:emplace(_card)
+	_card.foobar_create_deck_card = true
+	return _card
 end
 
 function G.UIDEF.foobar_edit_deck_ui ()
@@ -62,20 +88,20 @@ function G.UIDEF.foobar_edit_deck_ui ()
 					{n = G.UIT.C, config = {align = "cm", minw = 14}, nodes = {
 						{n = G.UIT.O, config = {object = UIBox({definition = FooBar.create_deck_ui(), config = {}})}}
 					}},
-					{n = G.UIT.C, config = {align = "cm"}, nodes = {
-						{n = G.UIT.O, config = {object = create_UIBox_generic_options({
-							contents = {create_tabs({
+					{n = G.UIT.C, config = {align = "tm", r=0.2, colour = G.C.UI.TRANSPARENT_DARK}, nodes = {
+						create_tabs({
+							tabs = {
 								{
-									label = "Edit Deck",
+									label = "Deck",
 									chosen = true,
 									tab_definition_function = G.UIDEF.foobar_edit_deck_tab
 								},
 								{
-									label = "Edit Card",
+									label = "Card",
 									tab_definition_function = G.UIDEF.foobar_edit_card_tab
 								}
-							})}
-						})}}
+							}
+						})
 					}}
         }},
         {n=G.UIT.R, config={id = 'overlay_menu_back_button', align = "cm", minw = 2.5, padding =0.1, r = 0.1, hover = true, colour = G.C.ORANGE, button = "foobar_leave_deck_editor", shadow = true, focus_args = {nav = 'wide', button = 'b'}}, nodes={
@@ -88,12 +114,39 @@ function G.UIDEF.foobar_edit_deck_ui ()
   }}
 end
 
+function G.UIDEF.foobar_edit_deck_tab ()
+	return {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.UI.TRANSPARENT_DARK}, nodes = {
+    {n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
+      {n=G.UIT.C, config={align = "cm", minh = 1,r = 0.2, padding = 0.2, minw = 1, colour = G.C.L_BLACK}, nodes={
+				{n = G.UIT.C, config = {align = "cm"}, nodes = {
+					{n = G.UIT.T, config = {text = "edit deck", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}}
+			}}
+		}}
+	}}
+end
+function G.UIDEF.foobar_edit_card_tab ()
+	G.foobar_create_deck_selected_card_cardarea.cards = {}
+	if G.foobar_create_deck_selected_card then
+			G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(G.foobar_create_deck_selected_card))
+		end
+	return {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.UI.TRANSPARENT_DARK}, nodes = {
+    {n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
+      {n=G.UIT.C, config={align = "cm", minh = 1,r = 0.2, padding = 0.2, minw = 1, colour = G.C.L_BLACK}, nodes={
+				{n = G.UIT.R, config = {id = "selected_card", align = "cm"}, nodes = {
+					{n = G.UIT.O, config = {object = G.foobar_create_deck_selected_card_cardarea}}
+				}}
+			}}
+		}}
+	}}
+end
+
 function G.FUNCS.foobar_leave_deck_editor (e)
 	if G.foobar_create_deck then
 		for _, card in ipairs(G.foobar_create_deck) do
 			if card and card.area then
 				card.area:remove_card(card)
-				card:remove()
+				G.foobar_create_deck_cardarea:emplace(card, nil, false)
 			end
 		end
 	end
@@ -205,6 +258,7 @@ function FooBar.create_deck_ui()
 							if SUITS[visible_suit[j]][i] then
 								local card = SUITS[visible_suit[j]][i]
 								G.foobar_create_deck_cardarea:remove_card(card)
+								card.foobar_create_deck_card = true
 								view_deck:emplace(card, nil, false)
 								-- stupid fricking peice of code that I hate
 							end
