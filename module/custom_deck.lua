@@ -6,16 +6,77 @@ SMODS.Back({
 	loc_vars = function(self, info_queue, card)
 		return {main_end = {
 			{n = G.UIT.R, config = {align = "cm", maxw = 1}, nodes = {
-				{n = G.UIT.R, config = {align = "cm", padding=0.1, r=0.2, colour = G.C.BLUE, button = "foobar_open_edit_deck", shadow=true}, nodes = {
+				{n = G.UIT.R, config = {align = "cm", padding=0.1, r=0.2, colour = G.C.BLUE, button = "foobar_open_edit_deck", func = "foobar_open_edit_deck_allow", shadow=true}, nodes = {
 					{n = G.UIT.T, config = {text = "Edit Deck", scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
 				}}
 			}}
 		}}
 	end,
+	initial_deck = {Ranks = {} },
+	apply = function (self, back)
+		local playing_cards = FooBar.generate_playing_cards_table()
+		for _, card in ipairs(playing_cards) do
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					SMODS.add_card{
+						set = "Base",
+						rank = card.rank,
+						suit = card.suit,
+						edition = card.edition,
+						seal = card.seal,
+						enhancement = card.enhancement,
+						area = G.deck
+					}
+					return true
+				end
+			}))
+		end
+	end
 })
+
+function G.FUNCS.foobar_open_edit_deck_allow(e)
+	if G.STAGE ~= G.STAGES.RUN then
+		e.config.colour = G.C.BLUE
+		e.config.button = 'foobar_open_edit_deck'
+	else
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+	end
+end
+
+function FooBar.generate_playing_cards_table()
+	local ret = {}
+	if not G.foobar_create_deck then
+		for _, rank in ipairs(SMODS.Rank.obj_buffer) do
+			for _, suit in ipairs(SMODS.Suit.obj_buffer) do
+				for _ = 1, 2 do
+					ret[#ret+1] = {
+						rank = rank,
+						suit = suit
+					}
+				end
+			end
+		end
+	else
+		for _, card in ipairs(G.foobar_create_deck) do
+			local en, _ = next(SMODS.get_enhancements(card))
+			ret[#ret+1] = {
+				rank = card:get_id(),
+				suit = card.base.suit,
+				edition = (card.edition or {}).key,
+				enhancement = en,
+				seal = card.seal
+			}
+		end
+	end
+	return ret
+end
 
 function G.FUNCS.foobar_open_edit_deck (e)
 	G.foobar_create_deck_selected_card = nil
+	if not G.foobar_create_deck_selected_card_properties then
+		FooBar.reset_selected_card_metatable()
+	end
 	if not G.foobar_create_deck_points then
 		G.foobar_create_deck_points = 1000
 	end
@@ -56,15 +117,81 @@ function G.FUNCS.foobar_open_edit_deck (e)
 	G.FUNCS.overlay_menu({definition=G.UIDEF.foobar_edit_deck_ui()})
 end
 
+function FooBar.reset_selected_card_metatable()
+	if not G.foobar_create_deck_selected_card_properties then
+		G.foobar_create_deck_selected_card_properties = setmetatable({}, {
+			__index = function(t, k)
+				if k == "is" then return nil end
+				return "ERROR"
+			end
+		})
+	end
+	for key, value in pairs(G.foobar_create_deck_selected_card_properties) do
+		G.foobar_create_deck_selected_card_properties.key = nil
+	end
+	if not G.foobar_create_deck_selected_card_properties_str then
+		G.foobar_create_deck_selected_card_properties_str = setmetatable({}, {
+			__index = function(t, k)
+				if k == "is" then return nil end
+				return "None" 
+			end
+		})
+	end
+	G.foobar_create_deck_selected_card_properties_str.edition = setmetatable({}, {
+		__index = function(t, k)
+			return "None" 
+		end
+	})
+	for _, key in ipairs(G.P_CENTER_POOLS.Edition) do
+		G.foobar_create_deck_selected_card_properties_str.edition[key.key] = localize{type="name_text", set = "Edition", key = key.key}
+	end
+	G.foobar_create_deck_selected_card_properties_str.enhancement = setmetatable({}, {
+		__index = function(t, k)
+			return "None" 
+		end
+	})
+	for _, key in ipairs(G.P_CENTER_POOLS.Enhanced) do
+		G.foobar_create_deck_selected_card_properties_str.enhancement[key.key] = localize{type="name_text", set = "Enhanced", key = key.key}
+	end
+	G.foobar_create_deck_selected_card_properties_str.seal = setmetatable({}, {
+		__index = function(t, k)
+			return "None" 
+		end
+	})
+	for _, key in ipairs(G.P_CENTER_POOLS.Seal) do
+		G.foobar_create_deck_selected_card_properties_str.seal[key.key] = localize{type="name_text", set = "Other", key = key.key:lower() .. "_seal"}
+	end
+end
+
 function FooBar.update_selected_card(card)
 	if G.OVERLAY_MENU then
-		local e = G.OVERLAY_MENU:get_UIE_by_ID("selected_card")
 		G.foobar_create_deck_selected_card = card
+		FooBar.reset_selected_card_metatable()
 		if G.foobar_create_deck_selected_card_cardarea.cards and G.foobar_create_deck_selected_card_cardarea.cards[1] then
-			G.foobar_create_deck_selected_card_cardarea:remove_card(G.foobar_create_deck_selected_card_cardarea.cards[1])
+			G.foobar_create_deck_selected_card_cardarea.cards[1]:start_dissolve()
 		end
 		if card then
 			G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(card))
+			if card.edition then
+				G.foobar_create_deck_selected_card_properties.edition = card.edition.key
+			else
+				G.foobar_create_deck_selected_card_properties.edition = "e_base"
+			end
+			local en, _ = next(SMODS.get_enhancements(card))
+			if en then
+				G.foobar_create_deck_selected_card_properties.enhancement = en
+			else
+				G.foobar_create_deck_selected_card_properties.enhancement = "c_base"
+			end
+			if card.seal then
+				G.foobar_create_deck_selected_card_properties.seal = card.seal
+			else
+				G.foobar_create_deck_selected_card_properties.seal = "None"
+			end
+		else
+			G.foobar_create_deck_selected_card_properties.edition = "e_base"
+			G.foobar_create_deck_selected_card_properties.enhancement = "c_base"
+			G.foobar_create_deck_selected_card_properties.seal = "None"
 		end
 	end
 end
@@ -74,7 +201,7 @@ function FooBar.create_deck_card(rank, suit)
 	G.playing_card = (G.playing_card and G.playing_card + 1) or 1
 	local _card = copy_card(card, nil, 0.7, G.playing_card)
 	G.foobar_create_deck[#G.foobar_create_deck + 1] = copy_card(card, nil, 0.7, G.playing_card)
-	card:remove()
+	card:start_dissolve()
 	G.foobar_create_deck_cardarea:emplace(_card)
 	_card.foobar_create_deck_card = true
 	return _card
@@ -125,16 +252,188 @@ function G.UIDEF.foobar_edit_deck_tab ()
 		}}
 	}}
 end
+
+function G.FUNCS.foobar_update_card_enhancement (e)
+	if G.foobar_create_deck_selected_card then
+		G.foobar_create_deck_selected_card:set_ability(e.config.value)
+		G.foobar_create_deck_selected_card_cardarea.cards[1]:set_ability(e.config.value)
+	end
+end
+
+function G.FUNCS.foobar_update_card_edition (e)
+	if G.foobar_create_deck_selected_card then
+		G.foobar_create_deck_selected_card:set_edition(e.config.value)
+		G.foobar_create_deck_selected_card_cardarea.cards[1]:set_edition(e.config.value)
+	end
+end
+
+function G.FUNCS.foobar_update_card_seal (e)
+	if G.foobar_create_deck_selected_card then
+		if e.config.value == "None" then e = {config = {}} end
+		G.foobar_create_deck_selected_card:set_seal(e.config.value)
+		G.foobar_create_deck_selected_card_cardarea.cards[1]:set_seal(e.config.value)
+	end
+end
+
+function G.FUNCS.foobar_copy_card (e)
+	if G.foobar_create_deck_selected_card then
+		G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+		local card = copy_card(G.foobar_create_deck_selected_card, nil, 0.7, G.playing_card)
+		G.foobar_create_deck_cardarea:emplace(card)
+		G.foobar_create_deck_cardarea:remove_card(card)
+		G.foobar_create_deck_selected_card.area:emplace(card)
+		G.foobar_create_deck[#G.foobar_create_deck+1] = card
+		if card:is_face() then
+			G.foobar_create_deck_face_tally = G.foobar_create_deck_face_tally + 1
+		elseif card:get_id() == 14 then
+			G.foobar_create_deck_ace_tally = G.foobar_create_deck_ace_tally + 1
+		else
+			G.foobar_create_deck_num_tally = G.foobar_create_deck_num_tally + 1
+		end
+		if card.base.suit then G.foobar_create_deck_suit_tallies[card.base.suit] = (G.foobar_create_deck_suit_tallies[card.base.suit] or 0) + 1 end
+		if card.base.value then G.foobar_create_deck_rank_tallies[card.base.value] = G.foobar_create_deck_rank_tallies[card.base.value] + 1 end
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				card.foobar_create_deck_card = true
+				card:click()
+				return true
+			end
+		}))
+	end
+end
+
+function G.FUNCS.foobar_destroy_card (e)
+	if G.foobar_create_deck_selected_card then
+		local card = G.foobar_create_deck_selected_card
+		FooBar.update_selected_card(nil)
+		if card:is_face() then
+			G.foobar_create_deck_face_tally = G.foobar_create_deck_face_tally - 1
+		elseif card:get_id() == 14 then
+			G.foobar_create_deck_ace_tally = G.foobar_create_deck_ace_tally - 1
+		else
+			G.foobar_create_deck_num_tally = G.foobar_create_deck_num_tally - 1
+		end
+		if card.base.suit then G.foobar_create_deck_suit_tallies[card.base.suit] = (G.foobar_create_deck_suit_tallies[card.base.suit] or 1) - 1 end
+		if card.base.value then G.foobar_create_deck_rank_tallies[card.base.value] = G.foobar_create_deck_rank_tallies[card.base.value] - 1 end
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				card:start_dissolve()
+				for index, _card in ipairs(G.foobar_create_deck) do
+					if _card == card then
+						table.remove(G.foobar_create_deck, index)
+						break
+					end
+				end
+				return true
+			end
+		}))
+	end
+end
+
 function G.UIDEF.foobar_edit_card_tab ()
 	G.foobar_create_deck_selected_card_cardarea.cards = {}
 	if G.foobar_create_deck_selected_card then
-			G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(G.foobar_create_deck_selected_card))
+		G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(G.foobar_create_deck_selected_card))
+	end
+	local valid_enhancement_keys = {"c_base"}
+	for _, enhancement in pairs(G.P_CENTER_POOLS.Enhanced) do
+		if not enhancement.foobar_ignore then
+			valid_enhancement_keys[#valid_enhancement_keys+1] = enhancement.key
 		end
+	end
+	local valid_edition_keys = {}
+	for _, edition in pairs(G.P_CENTER_POOLS.Edition) do
+		if not edition.foobar_ignore and edition.key ~= "e_negative" then
+			valid_edition_keys[#valid_edition_keys+1] = edition.key
+		end
+	end
+	local valid_seal_keys = {"None"}
+	for _, seal in pairs(G.P_CENTER_POOLS.Seal) do
+		if not seal.foobar_ignore then
+			valid_seal_keys[#valid_seal_keys+1] = seal.key
+		end
+	end
 	return {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.UI.TRANSPARENT_DARK}, nodes = {
-    {n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
-      {n=G.UIT.C, config={align = "cm", minh = 1,r = 0.2, padding = 0.2, minw = 1, colour = G.C.L_BLACK}, nodes={
-				{n = G.UIT.R, config = {id = "selected_card", align = "cm"}, nodes = {
-					{n = G.UIT.O, config = {object = G.foobar_create_deck_selected_card_cardarea}}
+		{n = G.UIT.R, config = {align = "cm"}, nodes = {
+			{n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
+				{n=G.UIT.C, config={align = "cm", minh = 1,r = 0.2, padding = 0.2, minw = 1, colour = G.C.L_BLACK}, nodes={
+					{n = G.UIT.R, config = {id = "selected_card", align = "cm"}, nodes = {
+						{n = G.UIT.O, config = {object = G.foobar_create_deck_selected_card_cardarea}}
+					}}
+				}}
+			}}
+		}},
+		{n = G.UIT.R , config = {padding = 0.05, align = "tm", outline = 2, outline_color = G.C.UI.OUTLINE_DARK, r = 0.2}, nodes = {
+			{n = G.UIT.C, config = {align = "tm", minw = 3}, nodes = {
+				{n = G.UIT.R, config = {align = "cm", padding = 0.2}, nodes = {
+					SMODS.GUI.dropdown_select{
+						id = "enhancement_select",
+						ui_type = G.UIT.C,
+						ref_table = G.foobar_create_deck_selected_card_properties,
+						ref_value = "enhancement",
+						options = valid_enhancement_keys,
+						dropdown_element_def = function (option, args)
+							return {n = G.UIT.T, config = {text = G.foobar_create_deck_selected_card_properties_str.enhancement[option], scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
+						end,
+						max_menu_h = 5,
+						callback = "foobar_update_card_enhancement",
+						close_on_select = true,
+						no_unselect = true,
+						display_choice_func = function (option)
+							return G.foobar_create_deck_selected_card_properties_str.enhancement[option]
+						end,
+					}
+				}},
+				{n = G.UIT.R, config = {align = "cm", padding = 0.2}, nodes = {
+					SMODS.GUI.dropdown_select{
+						id = "seal_select",
+						ui_type = G.UIT.C,
+						ref_table = G.foobar_create_deck_selected_card_properties,
+						ref_value = "seal",
+						options = valid_seal_keys,
+						dropdown_element_def = function (option, args)
+							return {n = G.UIT.T, config = {text = G.foobar_create_deck_selected_card_properties_str.seal[option], scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
+						end,
+						max_menu_h = 5,
+						callback = "foobar_update_card_seal",
+						close_on_select = true,
+						no_unselect = true,
+						display_choice_func = function (option)
+							return G.foobar_create_deck_selected_card_properties_str.seal[option]
+						end,
+					},
+				}},
+				{n = G.UIT.R, config = {align = "cm", padding = 0.2}, nodes = {
+					SMODS.GUI.dropdown_select{
+						id = "edition_select",
+						ui_type = G.UIT.C,
+						ref_table = G.foobar_create_deck_selected_card_properties,
+						ref_value = "edition",
+						options = valid_edition_keys,
+						dropdown_element_def = function (option, args)
+							return {n = G.UIT.T, config = {text = G.foobar_create_deck_selected_card_properties_str.edition[option], scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
+						end,
+						max_menu_h = 5,
+						callback = "foobar_update_card_edition",
+						close_on_select = true,
+						no_unselect = true,
+						display_choice_func = function (option)
+							return G.foobar_create_deck_selected_card_properties_str.edition[option]
+						end,
+					}
+				}}
+			}},
+			{n = G.UIT.C, config = {minw = 0.1, r = 0.1, colour = G.C.UI.TEXT_INACTIVE}},
+			{n = G.UIT.C, config = {align = "tm"}, nodes = {
+				{n = G.UIT.R, config = {align = "cm", padding = 0.2}, nodes = {
+					{n = G.UIT.C, config = {align = "cm", padding = 0.2, colour = G.C.RED, r=0.1, button = "foobar_copy_card", shadow = true}, nodes = {
+						{n = G.UIT.T, config = {text = "Copy", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+					}}
+				}},
+				{n = G.UIT.R, config = {align = "cm", padding = 0.2}, nodes = {
+					{n = G.UIT.C, config = {align = "cm", padding = 0.2, colour = G.C.RED, r=0.1, button = "foobar_destroy_card", shadow = true}, nodes = {
+						{n = G.UIT.T, config = {text = "Destroy", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+					}}
 				}}
 			}}
 		}}
@@ -368,8 +667,7 @@ function FooBar.create_deck_ui()
 			{n = G.UIT.O, config = {
 					object = DynaText({
 						string = {
-							{ string = localize('k_base_cards'), colour = G.C.RED },
-							modded and { string = localize('k_effective'), colour = G.C.BLUE } or nil
+							{ string = localize('k_base_cards'), colour = G.C.RED }
 						},
 						colours = { G.C.RED }, silent = true, scale = 0.4, pop_in_rate = 10, pop_delay = 4
 					})
@@ -480,20 +778,7 @@ function FooBar.create_deck_ui()
 				no_pips = true,
 			})
 		}} or nil,
-		{n = G.UIT.R, config = {align = "cm", padding = 0}, nodes = {
-			modded and {n = G.UIT.R, config = {align = "cm"}, nodes = {
-				{n = G.UIT.C, config = {padding = 0.3, r = 0.1, colour = mix_colours(G.C.BLUE, G.C.WHITE, 0.7)}, nodes = {}},
-				{n = G.UIT.T, config = {text = ' ' .. localize('ph_deck_preview_effective'), colour = G.C.WHITE, scale = 0.3}},}}
-			or nil,
-			wheel_flipped > 0 and {n = G.UIT.R, config = {align = "cm"}, nodes = {
-				{n = G.UIT.C, config = {padding = 0.3, r = 0.1, colour = flip_col}, nodes = {}},
-				{n = G.UIT.T, config = {
-						text = ' ' .. (wheel_flipped > 1 and
-							localize { type = 'variable', key = 'deck_preview_wheel_plural', vars = { wheel_flipped } } or
-							localize { type = 'variable', key = 'deck_preview_wheel_singular', vars = { wheel_flipped } }),
-						colour = G.C.WHITE, scale = 0.3
-					}},}}
-			or nil,}}}}
+	}}
 	local t = {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.CLEAR}, nodes = {
 		{n = G.UIT.O, config = {
 				id = 'suit_list',

@@ -254,7 +254,8 @@ SMODS.Edition{
 	no_collection = true,
 	in_shop = false,
 	badge_colour = G.C.GREEN,
-	config = {card_limit = 1}
+	config = {card_limit = 1},
+	foobar_ignore = true
 }
 
 -- Crypton
