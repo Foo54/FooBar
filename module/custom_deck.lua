@@ -1,3 +1,21 @@
+--- Dear unfortunate coder who is reading through this code
+--- this is a mess
+--- I hate UI
+--- well actually UI is fine I hate CardAreas
+--- good luck
+--- hopefully the names are descriptive enough
+--- I tried to comment but gave up
+--- If I did everything right you shouldn't need to patch or hook for cross mod support
+--- provided you didn't add any new card modifiers
+--- No this doesn't support stickers
+--- No its not going to
+--- If you want to make it include them have fun
+--- 
+--- oh if you want a seal, enhancement, or edition to be excluded, type
+--- 	foobar_ignore = true
+--- in the SMODS.Edition{} code or whatever else it is
+
+
 SMODS.Back({
 	key = "custom",
 	config = {},
