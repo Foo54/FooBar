@@ -626,6 +626,29 @@ function G.FUNCS.foobar_delete_voucher (e)
 	end
 end
 
+function G.FUNCS.foobar_create_deck_create_card (e)
+	if G.foobar_create_deck_add_card.rank and G.foobar_create_deck_add_card.suit then
+		local card = FooBar.create_deck_card(G.foobar_create_deck_add_card.rank, G.foobar_create_deck_add_card.suit)
+		if card:is_face() then
+			G.foobar_create_deck_face_tally = G.foobar_create_deck_face_tally + 1
+		elseif card:get_id() == 14 then
+			G.foobar_create_deck_ace_tally = G.foobar_create_deck_ace_tally + 1
+		else
+			G.foobar_create_deck_num_tally = G.foobar_create_deck_num_tally + 1
+		end
+		if card.base.suit then G.foobar_create_deck_suit_tallies[card.base.suit] = (G.foobar_create_deck_suit_tallies[card.base.suit] or 0) + 1 end
+		if card.base.value then G.foobar_create_deck_rank_tallies[card.base.value] = G.foobar_create_deck_rank_tallies[card.base.value] + 1 end
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				card.foobar_create_deck_card = true
+				card.area:remove_card(card)
+				G.foobar_create_deck_suit_cardareas[card.base.suit]:emplace(card)
+				return true
+			end
+		}))
+	end
+end
+
 function G.UIDEF.foobar_edit_deck_tab ()
 	
 	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
@@ -1214,7 +1237,7 @@ function FooBar.create_deck_ui()
 						negative_info = 'playing_card',
 						no_card_count = true
 					})
-				G.foobar_create_deck_suit_cardareas[#G.foobar_create_deck_suit_cardareas+1] = view_deck
+				G.foobar_create_deck_suit_cardareas[visible_suit[j]] = view_deck
 				table.insert(deck_tables,
 					{n = G.UIT.R, config = {align = "cm", padding = 0}, nodes = {
 						{n = G.UIT.O, config = {object = view_deck}}}}
