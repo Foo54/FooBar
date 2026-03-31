@@ -92,12 +92,12 @@ end
 function FooBar.generate_playing_cards_table()
 	local ret = {}
 	if not G.foobar_create_deck then
-		for _, rank in ipairs(SMODS.Ranks) do
-			for _, suit in ipairs(SMODS.Suit.obj_buffer) do
+		for _, rank in pairs(SMODS.Ranks) do
+			for _, suit in pairs(SMODS.Suits) do
 				for _ = 1, 2 do
 					ret[#ret+1] = {
 						rank = rank.key,
-						suit = suit
+						suit = suit.key
 					}
 				end
 			end
@@ -194,10 +194,10 @@ function G.FUNCS.foobar_open_edit_deck (e)
 	G.foobar_create_deck_load_slot = G.foobar_create_deck_load_slot or 1
 	if not G.foobar_create_deck then 
 		G.foobar_create_deck = {}
-		for _, rank in ipairs(SMODS.Rank.obj_buffer) do
-			for _, suit in ipairs(SMODS.Suit.obj_buffer) do
+		for _, rank in pairs(SMODS.Ranks) do
+			for _, suit in pairs(SMODS.Suits) do
 				for _ = 1, 2 do
-					FooBar.create_deck_card(rank, suit)
+					FooBar.create_deck_card(rank.key, suit.key)
 				end
 			end
 		end
@@ -296,6 +296,19 @@ function FooBar.create_deck_card(rank, suit)
 end
 
 function FooBar.unload_create_ui()
+	if G.foobar_create_deck_selected_card_cardarea then
+		G.foobar_create_deck_selected_card_cardarea.cards = {}
+		G.foobar_create_deck_selected_card_cardarea.children = {}
+	end
+	G.E_MANAGER:add_event(Event({
+		func = function()
+			if G.foobar_create_deck_selected_card_cardarea then
+				G.foobar_create_deck_selected_card_cardarea.cards = {}
+				G.foobar_create_deck_selected_card_cardarea.children = {}
+			end
+			return true
+		end
+	}))
 	if G.foobar_create_deck then
 		G.foobar_create_deck_memory = FooBar.generate_playing_cards_table()
 		G.foobar_create_deck_memory_consumables = FooBar.generate_consumables_table()
@@ -450,7 +463,6 @@ function G.FUNCS.foobar_load_from_slot (e)
 	for _, c in ipairs(deck.consumables) do
 		G.E_MANAGER:add_event(Event({
 			func = function()
-				print(c)
 				local card = SMODS.create_card({area = G.foobar_create_deck_consumables_cardarea_offscreen, key = c})
 				local _card = copy_card(card, nil, 0.7)
 				G.foobar_create_deck_consumables[#G.foobar_create_deck_consumables + 1] = _card
@@ -464,7 +476,6 @@ function G.FUNCS.foobar_load_from_slot (e)
 	for _, c in ipairs(deck.vouchers) do
 		G.E_MANAGER:add_event(Event({
 			func = function()
-				print(c)
 				local card = SMODS.create_card({area = G.foobar_create_deck_vouchers_cardarea_offscreen, key = c})
 				local _card = copy_card(card, nil, 0.7)
 				G.foobar_create_deck_vouchers[#G.foobar_create_deck_vouchers + 1] = _card
@@ -669,7 +680,10 @@ function G.FUNCS.foobar_create_deck_create_card (e)
 end
 
 function G.UIDEF.foobar_edit_deck_tab ()
-	
+	if G.foobar_create_deck_selected_card_cardarea then
+		G.foobar_create_deck_selected_card_cardarea.cards = {}
+		G.foobar_create_deck_selected_card_cardarea.children = {}
+	end
 	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
 	if not G.foobar_create_deck_consumables_cardarea then
 		G.foobar_create_deck_consumables_cardarea = CardArea(0, 0, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
@@ -767,7 +781,6 @@ function G.UIDEF.foobar_edit_deck_tab ()
 							break
 						end
 					end
-					print("4")
 					G.foobar_create_deck_vouchers_cardarea_offscreen.added[i] = true
 					G.foobar_create_deck_vouchers_cardarea:emplace(__card)
 				end
@@ -813,7 +826,6 @@ function G.UIDEF.foobar_edit_deck_tab ()
 				func = function ()
 					if not card.REMOVED then
 						if not G.foobar_create_deck_vouchers_cardarea_offscreen.added[i] then
-							print(3)
 							G.foobar_create_deck_vouchers_cardarea:emplace(copy_card(card, nil, 0.7))
 						end
 					end
