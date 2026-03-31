@@ -689,6 +689,7 @@ function G.UIDEF.foobar_edit_deck_tab ()
 		G.foobar_create_deck_consumables_cardarea_offscreen.foobar_cardarea = true
 		if G.foobar_create_deck_memory_consumables then
 			G.foobar_create_deck_consumables_cardarea_offscreen.cards = {}
+			G.foobar_create_deck_consumables_cardarea_offscreen.children = {}
 			for _, c in ipairs(G.foobar_create_deck_memory_consumables) do
 				local card = SMODS.create_card({area = G.foobar_create_deck_consumables_cardarea_offscreen, key = c})
 				local _card = copy_card(card, nil, 0.7)
@@ -741,6 +742,7 @@ function G.UIDEF.foobar_edit_deck_tab ()
 		G.foobar_create_deck_vouchers_cardarea_offscreen.foobar_cardarea = true
 		if G.foobar_create_deck_memory_vouchers then
 			G.foobar_create_deck_vouchers_cardarea_offscreen.cards = {}
+			G.foobar_create_deck_vouchers_cardarea_offscreen.children = {}
 			for _, c in ipairs(G.foobar_create_deck_memory_vouchers) do
 				local card = SMODS.create_card({area = G.foobar_create_deck_vouchers_cardarea_offscreen, key = c})
 				local _card = copy_card(card, nil, 0.7)
@@ -786,6 +788,7 @@ function G.UIDEF.foobar_edit_deck_tab ()
 	end
 	if not G.foobar_create_deck_consumables_cardarea.cards then
 		G.foobar_create_deck_consumables_cardarea.cards = {}
+		G.foobar_create_deck_consumables_cardarea.children = {}
 		for i, card in ipairs(G.foobar_create_deck_consumables) do
 			G.E_MANAGER:add_event(Event({
 				func = function ()
@@ -803,6 +806,7 @@ function G.UIDEF.foobar_edit_deck_tab ()
 	end
 	if not G.foobar_create_deck_vouchers_cardarea.cards then
 		G.foobar_create_deck_vouchers_cardarea.cards = {}
+		G.foobar_create_deck_vouchers_cardarea.children = {}
 		for i, card in ipairs(G.foobar_create_deck_vouchers) do
 			G.E_MANAGER:add_event(Event({
 				func = function ()
@@ -1043,6 +1047,7 @@ function G.UIDEF.foobar_edit_card_tab ()
 	end
 	
 	G.foobar_create_deck_selected_card_cardarea.cards = {}
+	G.foobar_create_deck_selected_card_cardarea.children = {}
 	if G.foobar_create_deck_selected_card then
 		G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(G.foobar_create_deck_selected_card))
 	end
