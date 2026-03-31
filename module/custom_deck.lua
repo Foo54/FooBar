@@ -242,11 +242,24 @@ function G.UIDEF.foobar_edit_deck_ui ()
 end
 
 function G.UIDEF.foobar_edit_deck_tab ()
+	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
+	if not G.foobar_create_deck_consumables_cardarea then
+		G.foobar_create_deck_consumables_cardarea = CardArea(-20, -20, G.CARD_W * 5, G.CARD_H * 0.7, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 1
+		})
+	end
 	return {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.UI.TRANSPARENT_DARK}, nodes = {
-    {n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
-      {n=G.UIT.C, config={align = "cm", minh = 1,r = 0.2, padding = 0.2, minw = 1, colour = G.C.L_BLACK}, nodes={
-				{n = G.UIT.C, config = {align = "cm"}, nodes = {
-					{n = G.UIT.T, config = {text = "edit deck", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+    {n=G.UIT.C, config = {align = "ct"}, nodes = {
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.GREEN, padding = 0.1, r = 0.1, button = "foobar_save_to_slot", shadow = true}, nodes = {
+					{n = G.UIT.T, config = {text = "Save [temp]", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}},
+				{n = G.UIT.B, config = {w = 0.2, h = 0.1}},
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.GREEN, padding = 0.1, r = 0.1, button = "foobar_save_to_slot", shadow = true}, nodes = {
+					{n = G.UIT.T, config = {text = "Load [temp]", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
 				}}
 			}}
 		}}
