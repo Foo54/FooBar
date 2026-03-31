@@ -288,6 +288,12 @@ function FooBar.unload_create_ui()
 			end
 		end
 	end
+	if G.foobar_create_deck_consumables_cardarea and G.foobar_create_deck_consumables_cardarea.highlighted[1] then
+		G.foobar_create_deck_consumables_cardarea:remove_from_highlighted(G.foobar_create_deck_consumables_cardarea.highlighted[1], true)
+	end
+	if G.foobar_create_deck_vouchers_cardarea and G.foobar_create_deck_vouchers_cardarea.highlighted[1] then
+		G.foobar_create_deck_vouchers_cardarea:remove_from_highlighted(G.foobar_create_deck_vouchers_cardarea.highlighted[1], true)
+	end
 	if G.foobar_create_deck_consumables then
 		for _, card in ipairs(G.foobar_create_deck_consumables) do
 			if card and card.area then
@@ -590,6 +596,36 @@ function G.FUNCS.can_use_consumeable (e)
 	end
 end
 
+function G.FUNCS.foobar_delete_consumable (e)
+	if G.foobar_create_deck_consumables_cardarea then
+		if G.foobar_create_deck_consumables_cardarea.highlighted[1] then
+			for index, card in ipairs(G.foobar_create_deck_consumables) do
+				if card.config.center.key == G.foobar_create_deck_consumables_cardarea.highlighted[1].config.center.key then
+					card:remove()
+					table.remove(G.foobar_create_deck_consumables, index)
+					G.foobar_create_deck_consumables_cardarea.highlighted[1]:start_dissolve()
+					return
+				end
+			end
+		end
+	end
+end
+
+function G.FUNCS.foobar_delete_voucher (e)
+	if G.foobar_create_deck_vouchers_cardarea then
+		if G.foobar_create_deck_vouchers_cardarea.highlighted[1] then
+			for index, card in ipairs(G.foobar_create_deck_vouchers) do
+				if card.config.center.key == G.foobar_create_deck_vouchers_cardarea.highlighted[1].config.center.key then
+					card:remove()
+					table.remove(G.foobar_create_deck_vouchers, index)
+					G.foobar_create_deck_vouchers_cardarea.highlighted[1]:start_dissolve()
+					return
+				end
+			end
+		end
+	end
+end
+
 function G.UIDEF.foobar_edit_deck_tab ()
 	
 	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
@@ -635,9 +671,9 @@ function G.UIDEF.foobar_edit_deck_tab ()
 							break
 						end
 					end
-					print("2")
 					G.foobar_create_deck_consumables_cardarea_offscreen.added[i] = true
 					G.foobar_create_deck_consumables_cardarea:emplace(__card)
+					__card.foobar_deck_editor = true
 				end
 				return true
 			end
@@ -714,8 +750,9 @@ function G.UIDEF.foobar_edit_deck_tab ()
 				func = function ()
 					if not card.REMOVED then
 						if not G.foobar_create_deck_consumables_cardarea_offscreen.added[i] then
-							print(1)
-							G.foobar_create_deck_consumables_cardarea:emplace(copy_card(card, nil, 0.7))
+							local _card = copy_card(card, nil, 0.7)
+							G.foobar_create_deck_consumables_cardarea:emplace(_card)
+							_card.foobar_deck_editor = true
 						end
 					end
 					return true
@@ -957,6 +994,13 @@ end
 
 function G.UIDEF.foobar_edit_card_tab ()
 
+	if G.foobar_create_deck_consumables_cardarea and G.foobar_create_deck_consumables_cardarea.highlighted[1] then
+		G.foobar_create_deck_consumables_cardarea:remove_from_highlighted(G.foobar_create_deck_consumables_cardarea.highlighted[1], true)
+	end
+	if G.foobar_create_deck_vouchers_cardarea and G.foobar_create_deck_vouchers_cardarea.highlighted[1] then
+		G.foobar_create_deck_vouchers_cardarea:remove_from_highlighted(G.foobar_create_deck_vouchers_cardarea.highlighted[1], true)
+	end
+	
 	G.foobar_create_deck_selected_card_cardarea.cards = {}
 	if G.foobar_create_deck_selected_card then
 		G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(G.foobar_create_deck_selected_card))
