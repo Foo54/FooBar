@@ -69,6 +69,7 @@ SMODS.Back({
 						key = card,
 						area = G.vouchers
 					}
+					c.cost = 0
 					c:redeem()
 					c:start_dissolve()
 					return true
