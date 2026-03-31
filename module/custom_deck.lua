@@ -18,7 +18,7 @@ SMODS.Back({
 		for _, card in ipairs(playing_cards) do
 			G.E_MANAGER:add_event(Event({
 				func = function()
-					SMODS.add_card{
+					local c = SMODS.add_card{
 						set = "Base",
 						rank = card.rank,
 						suit = card.suit,
@@ -47,11 +47,11 @@ end
 function FooBar.generate_playing_cards_table()
 	local ret = {}
 	if not G.foobar_create_deck then
-		for _, rank in ipairs(SMODS.Rank.obj_buffer) do
+		for _, rank in ipairs(SMODS.Ranks) do
 			for _, suit in ipairs(SMODS.Suit.obj_buffer) do
 				for _ = 1, 2 do
 					ret[#ret+1] = {
-						rank = rank,
+						rank = rank.key,
 						suit = suit
 					}
 				end
@@ -61,7 +61,7 @@ function FooBar.generate_playing_cards_table()
 		for _, card in ipairs(G.foobar_create_deck) do
 			local en, _ = next(SMODS.get_enhancements(card))
 			ret[#ret+1] = {
-				rank = card:get_id(),
+				rank = card.base.value,
 				suit = card.base.suit,
 				edition = (card.edition or {}).key,
 				enhancement = en,
@@ -104,6 +104,28 @@ function G.FUNCS.foobar_open_edit_deck (e)
 				negative_info = 'playing_card'
 		})
 	end
+	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
+	if not G.foobar_create_deck_consumables_cardarea then
+		G.foobar_create_deck_consumables_cardarea = CardArea(-20, -20, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 1
+		})
+	end
+	G.foobar_create_deck_consumables_cardarea.cards = G.foobar_create_deck_consumables_cardarea.cards or {}
+	G.foobar_create_deck_vouchers = G.foobar_create_deck_vouchers or {}
+	if not G.foobar_create_deck_vouchers_cardarea then
+		G.foobar_create_deck_vouchers_cardarea = CardArea(-20, -20, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 1
+		})
+	end
+	G.foobar_create_deck_vouchers_cardarea.cards = G.foobar_create_deck_vouchers_cardarea.cards or {}
+	G.foobar_create_deck_save_slot = G.foobar_create_deck_save_slot or 1
+	G.foobar_create_deck_load_slot = G.foobar_create_deck_load_slot or 1
 	if not G.foobar_create_deck then 
 		G.foobar_create_deck = {}
 		for _, rank in ipairs(SMODS.Rank.obj_buffer) do
@@ -197,10 +219,10 @@ function FooBar.update_selected_card(card)
 end
 
 function FooBar.create_deck_card(rank, suit)
-	local card = SMODS.create_card({set = "Base", area = G.foobar_create_deck_cardarea, rank = rank, suit = suit, scale = 0.7})
+	local card = SMODS.create_card({set = "Base", area = G.foobar_create_deck_cardarea, rank = rank, suit = suit})
 	G.playing_card = (G.playing_card and G.playing_card + 1) or 1
 	local _card = copy_card(card, nil, 0.7, G.playing_card)
-	G.foobar_create_deck[#G.foobar_create_deck + 1] = copy_card(card, nil, 0.7, G.playing_card)
+	G.foobar_create_deck[#G.foobar_create_deck + 1] = _card
 	card:start_dissolve()
 	G.foobar_create_deck_cardarea:emplace(_card)
 	_card.foobar_create_deck_card = true
@@ -241,27 +263,218 @@ function G.UIDEF.foobar_edit_deck_ui ()
   }}
 end
 
-function G.UIDEF.foobar_edit_deck_tab ()
-	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
-	if not G.foobar_create_deck_consumables_cardarea then
-		G.foobar_create_deck_consumables_cardarea = CardArea(-20, -20, G.CARD_W * 5, G.CARD_H * 0.7, {
-			type="hand",
-			bg_colour = G.C.UI.TRANSPARENT_DARK,
-			no_card_count = true,
-			highlight_limit = 1
-		})
+function G.FUNCS.foobar_save_to_slot (e)
+	local slot = G.foobar_create_deck_save_slot
+	local deck = FooBar.generate_playing_cards_table()
+	if not G.PROFILES[G.SETTINGS.profile].foobar_saved_decks then
+		G.PROFILES[G.SETTINGS.profile].foobar_saved_decks = {}
 	end
+	G.PROFILES[G.SETTINGS.profile].foobar_saved_decks[slot] = {
+		points = G.foobar_create_deck_points,
+		deck = deck
+	}
+	G:save_progress()
+end
+
+function G.FUNCS.foobar_load_from_slot (e)
+	local slot = G.foobar_create_deck_load_slot
+	G.foobar_create_deck_selected_card = nil
+	if not G.PROFILES[G.SETTINGS.profile].foobar_saved_decks then
+		print("foobar_saved_decks NOT FOUND")
+		return
+	end
+	local deck = G.PROFILES[G.SETTINGS.profile].foobar_saved_decks[slot]
+	if not deck then
+		print("SLOT " .. slot .. " NOT SAVED")
+		return
+	end
+	G.foobar_create_deck_points = deck.points
+	deck = deck.deck
+	for i = #G.foobar_create_deck, 1, -1 do
+		local card = G.foobar_create_deck[i]
+		if card then
+			table.remove(G.foobar_create_deck, i)
+			card:remove()
+			card:start_dissolve()
+		end
+	end
+	for _, c in ipairs(deck) do
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				local card = SMODS.create_card({set = "Base", area = G.foobar_create_deck_cardarea, rank = c.rank, suit = c.suit, edition = c.edition, enhancement = c.enhancement, seal = c.seal})
+				G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+				local _card = copy_card(card, nil, 0.7, G.playing_card)
+				G.foobar_create_deck[#G.foobar_create_deck + 1] = _card
+				card:start_dissolve()
+				G.foobar_create_deck_cardarea:emplace(_card)
+				_card.foobar_create_deck_card = true
+				return true
+			end
+		}))
+	end
+	G.E_MANAGER:add_event(Event({
+		func = function()
+			G.FUNCS.foobar_leave_deck_editor(e)
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					G.FUNCS.foobar_open_edit_deck(e)
+					return true
+				end
+			}))
+			return true
+		end
+	}))
+end
+
+function G.UIDEF.foobar_edit_deck_tab ()
+	G.foobar_create_deck_add_card = G.foobar_create_deck_add_card or {}
+	G.foobar_create_deck_add_card.rank = G.foobar_create_deck_add_card.rank or "10"
+	G.foobar_create_deck_add_card.suit = G.foobar_create_deck_add_card.suit or "Spades"
+	local rank_options = {}
+	for _, rank in ipairs(SMODS.Rank.obj_buffer) do
+		rank_options[#rank_options+1] = rank
+	end
+	local suit_options = {}
+	for _, suit in ipairs(SMODS.Suit.obj_buffer) do
+		suit_options[#suit_options+1] = suit
+	end
+	G.foobar_create_deck_consumables_cardarea.cards = G.foobar_create_deck_consumables_cardarea.cards or {}
+	G.foobar_create_deck_vouchers_cardarea.cards = G.foobar_create_deck_vouchers_cardarea.cards or {}
 	return {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.UI.TRANSPARENT_DARK}, nodes = {
     {n=G.UIT.C, config = {align = "ct"}, nodes = {
 			{n = G.UIT.R, config = {align = "cm"}, nodes = {
-				{n = G.UIT.C, config = {align = "cm", colour = G.C.GREEN, padding = 0.1, r = 0.1, button = "foobar_save_to_slot", shadow = true}, nodes = {
-					{n = G.UIT.T, config = {text = "Save [temp]", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				SMODS.GUI.dropdown_select{
+					id = "save_select",
+					ui_type = G.UIT.C,
+					ref_table = G,
+					ref_value = "foobar_create_deck_save_slot",
+					options = {"1", "2", "3", "4", "5"},
+					dropdown_element_def = function (option, args)
+						return {n = G.UIT.T, config = {text = "Save Slot " .. option, scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
+					end,
+					callback = "foobar_save_to_slot",
+					close_on_select = true,
+					no_unselect = true,
+					display_choice_func = function (option)
+						return "Save Slot " .. option
+					end,
+				},
+				{n = G.UIT.C, nodes = {
+					{n = G.UIT.B, config = {w = 0.2, h = 0.1}},
 				}},
-				{n = G.UIT.B, config = {w = 0.2, h = 0.1}},
-				{n = G.UIT.C, config = {align = "cm", colour = G.C.GREEN, padding = 0.1, r = 0.1, button = "foobar_save_to_slot", shadow = true}, nodes = {
-					{n = G.UIT.T, config = {text = "Load [temp]", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				SMODS.GUI.dropdown_select{
+					id = "load_select",
+					ui_type = G.UIT.C,
+					ref_table = G,
+					ref_value = "foobar_create_deck_load_slot",
+					options = {"1", "2", "3", "4", "5"},
+					dropdown_element_def = function (option, args)
+						return {n = G.UIT.T, config = {text = "Load Slot " .. option, scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
+					end,
+					callback = "foobar_load_from_slot",
+					close_on_select = true,
+					no_unselect = true,
+					display_choice_func = function (option)
+						return "Load Slot " .. option
+					end,
+				},
+			}},
+			{n = G.UIT.R, nodes = {
+				{n = G.UIT.B, config = {w = 0.1, h = 0.3}}
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				SMODS.GUI.dropdown_select{
+					id = "rank_select",
+					ui_type = G.UIT.C,
+					ref_table = G.foobar_create_deck_add_card,
+					ref_value = "rank",
+					options = rank_options,
+					dropdown_element_def = function (option, args)
+						return {n = G.UIT.T, config = {text = localize(option, "ranks"), scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
+					end,
+					max_menu_h = 5,
+					close_on_select = true,
+					no_unselect = true,
+					display_choice_func = function (option)
+						return localize(option, "ranks")
+					end,
+				},
+				{n = G.UIT.C, config = {align = "cm"}, nodes = {
+					{n = G.UIT.T, config = {text = " of ", scale = 0.4, colour = G.C.UI.TEXT_LIGHT}}
+				}},
+				SMODS.GUI.dropdown_select{
+					id = "suit_select",
+					ui_type = G.UIT.C,
+					ref_table = G.foobar_create_deck_add_card,
+					ref_value = "suit",
+					options = suit_options,
+					dropdown_element_def = function (option, args)
+						return {n = G.UIT.T, config = {text = localize(option, "suits_plural"), scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
+					end,
+					max_menu_h = 5,
+					close_on_select = true,
+					no_unselect = true,
+					display_choice_func = function (option)
+						return localize(option, "suits_plural")
+					end,
+				},
+				{n = G.UIT.C, nodes = {{n = G.UIT.B, config = {w = 0.2, h = 0.1}}}},
+				{n = G.UIT.C, config = {align = "cm", padding = 0.1, r = 0.1, colour = G.C.RED, shadow = true, button = "foobar_create_deck_create_card"}, nodes = {
+					{n = G.UIT.T, config = {text = "Create Card", scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
 				}}
-			}}
+			}},
+			{n = G.UIT.R, nodes = {
+				{n = G.UIT.B, config = {w = 0.1, h = 0.3}}
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.O, config = {object = G.foobar_create_deck_consumables_cardarea}}
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, nodes = {
+					{n = G.UIT.B, config = {w = 0.2, h = 0.1}},
+				}},
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.BLUE, padding = 0.1, r = 0.1, button = "foobar_open_consumable_select", shadow = true}, nodes = {
+					{n = G.UIT.T, config = {text = "Add Consumable", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}},
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, nodes = {
+					{n = G.UIT.B, config = {w = 0.2, h = 0.1}},
+				}},
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.BLUE, padding = 0.1, r = 0.1, button = "foobar_delete_consumable", shadow = true}, nodes = {
+					{n = G.UIT.T, config = {text = "Remove Consumable", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}}
+			}},
+			{n = G.UIT.R, nodes = {
+				{n = G.UIT.B, config = {w = 0.1, h = 0.3}}
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.O, config = {object = G.foobar_create_deck_vouchers_cardarea}}
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, nodes = {
+					{n = G.UIT.B, config = {w = 0.2, h = 0.1}},
+				}},
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, button = "foobar_open_consumable_select", shadow = true}, nodes = {
+					{n = G.UIT.T, config = {text = "Add Voucher", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}},
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, nodes = {
+					{n = G.UIT.B, config = {w = 0.2, h = 0.1}},
+				}},
+			}},
+			{n = G.UIT.R, config = {align = "cm"}, nodes = {
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, button = "foobar_delete_consumable", shadow = true}, nodes = {
+					{n = G.UIT.T, config = {text = "Remove Voucher", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+				}}
+			}},
 		}}
 	}}
 end
