@@ -14,7 +14,9 @@ SMODS.Back({
 	end,
 	initial_deck = {Ranks = {} },
 	apply = function (self, back)
-		local playing_cards = FooBar.generate_playing_cards_table()
+		local playing_cards = G.foobar_create_deck_memory or FooBar.generate_playing_cards_table()
+		local consumables = G.foobar_create_deck_memory_consumables or FooBar.generate_consumables_table()
+		local vouchers = G.foobar_create_deck_memory_vouchers or FooBar.generate_vouchers_table()
 		for _, card in ipairs(playing_cards) do
 			G.E_MANAGER:add_event(Event({
 				func = function()
@@ -27,6 +29,30 @@ SMODS.Back({
 						enhancement = card.enhancement,
 						area = G.deck
 					}
+					return true
+				end
+			}))
+		end
+		for _, card in ipairs(consumables) do
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					local c = SMODS.add_card{
+						key = card,
+						area = G.consumeables
+					}
+					return true
+				end
+			}))
+		end
+		for _, card in ipairs(vouchers) do
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					local c = SMODS.create_card{
+						key = card,
+						area = G.vouchers
+					}
+					c:redeem()
+					c:start_dissolve()
 					return true
 				end
 			}))
@@ -59,14 +85,40 @@ function FooBar.generate_playing_cards_table()
 		end
 	else
 		for _, card in ipairs(G.foobar_create_deck) do
-			local en, _ = next(SMODS.get_enhancements(card))
-			ret[#ret+1] = {
-				rank = card.base.value,
-				suit = card.base.suit,
-				edition = (card.edition or {}).key,
-				enhancement = en,
-				seal = card.seal
-			}
+			if not card.REMOVED then
+				local en, _ = next(SMODS.get_enhancements(card))
+				ret[#ret+1] = {
+					rank = card.base.value,
+					suit = card.base.suit,
+					edition = (card.edition or {}).key,
+					enhancement = en,
+					seal = card.seal
+				}
+			end
+		end
+	end
+	return ret
+end
+
+function FooBar.generate_consumables_table()
+	local ret = {}
+	if G.foobar_create_deck_consumables then
+		for _, card in ipairs(G.foobar_create_deck_consumables) do
+			if not card.REMOVED then
+				ret[#ret+1] = card.config.center.key
+			end
+		end
+	end
+	return ret
+end
+
+function FooBar.generate_vouchers_table()
+	local ret = {}
+	if G.foobar_create_deck_vouchers then
+		for _, card in ipairs(G.foobar_create_deck_vouchers) do
+			if not card.REMOVED then
+				ret[#ret+1] = card.config.center.key
+			end
 		end
 	end
 	return ret
@@ -87,6 +139,7 @@ function G.FUNCS.foobar_open_edit_deck (e)
 			no_card_count = true,
 			highlight_limit = 0
 		})
+		G.foobar_create_deck_selected_card_cardarea.foobar_cardarea = true
 	end
 	if not G.foobar_create_deck_suit_cardareas then
 		G.foobar_create_deck_suit_cardareas = {}
@@ -103,27 +156,21 @@ function G.FUNCS.foobar_open_edit_deck (e)
 				draw_layers = { 'card' },
 				negative_info = 'playing_card'
 		})
+		G.foobar_create_deck_cardarea.foobar_cardarea = true
+		if G.foobar_create_deck_memory then
+			G.foobar_create_deck_cardarea.cards = {}
+			for _, c in ipairs(G.foobar_create_deck_memory) do
+				local card = SMODS.create_card({set = "Base", area = G.foobar_create_deck_cardarea, rank = c.rank, suit = c.suit, edition = c.edition, enhancement = c.enhancement, seal = c.seal})
+				G.playing_card = (G.playing_card and G.playing_card + 1) or 1
+				local _card = copy_card(card, nil, 0.7, G.playing_card)
+				G.foobar_create_deck[#G.foobar_create_deck + 1] = _card
+				card:start_dissolve()
+				G.foobar_create_deck_cardarea:emplace(_card)
+				_card.foobar_create_deck_card = true
+			end
+		end
 	end
-	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
-	if not G.foobar_create_deck_consumables_cardarea then
-		G.foobar_create_deck_consumables_cardarea = CardArea(-20, -20, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
-			type="hand",
-			bg_colour = G.C.UI.TRANSPARENT_DARK,
-			no_card_count = true,
-			highlight_limit = 1
-		})
-	end
-	G.foobar_create_deck_consumables_cardarea.cards = G.foobar_create_deck_consumables_cardarea.cards or {}
-	G.foobar_create_deck_vouchers = G.foobar_create_deck_vouchers or {}
-	if not G.foobar_create_deck_vouchers_cardarea then
-		G.foobar_create_deck_vouchers_cardarea = CardArea(-20, -20, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
-			type="hand",
-			bg_colour = G.C.UI.TRANSPARENT_DARK,
-			no_card_count = true,
-			highlight_limit = 1
-		})
-	end
-	G.foobar_create_deck_vouchers_cardarea.cards = G.foobar_create_deck_vouchers_cardarea.cards or {}
+
 	G.foobar_create_deck_save_slot = G.foobar_create_deck_save_slot or 1
 	G.foobar_create_deck_load_slot = G.foobar_create_deck_load_slot or 1
 	if not G.foobar_create_deck then 
@@ -229,6 +276,50 @@ function FooBar.create_deck_card(rank, suit)
 	return _card
 end
 
+function FooBar.unload_create_ui()
+	if G.foobar_create_deck then
+		G.foobar_create_deck_memory = FooBar.generate_playing_cards_table()
+		G.foobar_create_deck_memory_consumables = FooBar.generate_consumables_table()
+		G.foobar_create_deck_memory_vouchers = FooBar.generate_vouchers_table()
+		for _, card in ipairs(G.foobar_create_deck) do
+			if card and card.area then
+				card.area:remove_card(card)
+				G.foobar_create_deck_cardarea:emplace(card, nil, false)
+			end
+		end
+	end
+	if G.foobar_create_deck_consumables then
+		for _, card in ipairs(G.foobar_create_deck_consumables) do
+			if card and card.area then
+				card.area:remove_card(card)
+				G.foobar_create_deck_consumables_cardarea_offscreen:emplace(card, nil, false)
+				G.E_MANAGER:add_event(Event({
+					type="after",
+					func = function ()
+						card:remove_from_area()
+						return true
+					end
+				}))
+			end
+		end
+	end
+	if G.foobar_create_deck_vouchers then
+		for _, card in ipairs(G.foobar_create_deck_vouchers) do
+			if card and card.area then
+				card.area:remove_card(card)
+				G.foobar_create_deck_vouchers_cardarea_offscreen:emplace(card, nil, false)
+				G.E_MANAGER:add_event(Event({
+					type="after",
+					func = function ()
+						card:remove_from_area()
+						return true
+					end
+				}))
+			end
+		end
+	end
+end
+
 function G.UIDEF.foobar_edit_deck_ui ()
 	return {n=G.UIT.ROOT, config = {align = "cm", minw = G.ROOM.T.w*5, minh = G.ROOM.T.h*5,padding = 0.1, r = 0.1, colour = {G.C.GREY[1], G.C.GREY[2], G.C.GREY[3],0.7}}, nodes={
     {n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
@@ -266,12 +357,16 @@ end
 function G.FUNCS.foobar_save_to_slot (e)
 	local slot = G.foobar_create_deck_save_slot
 	local deck = FooBar.generate_playing_cards_table()
+	local consumables = FooBar.generate_consumables_table()
+	local vouchers = FooBar.generate_vouchers_table()
 	if not G.PROFILES[G.SETTINGS.profile].foobar_saved_decks then
 		G.PROFILES[G.SETTINGS.profile].foobar_saved_decks = {}
 	end
 	G.PROFILES[G.SETTINGS.profile].foobar_saved_decks[slot] = {
 		points = G.foobar_create_deck_points,
-		deck = deck
+		deck = deck,
+		consumables = consumables,
+		vouchers = vouchers
 	}
 	G:save_progress()
 end
@@ -289,7 +384,6 @@ function G.FUNCS.foobar_load_from_slot (e)
 		return
 	end
 	G.foobar_create_deck_points = deck.points
-	deck = deck.deck
 	for i = #G.foobar_create_deck, 1, -1 do
 		local card = G.foobar_create_deck[i]
 		if card then
@@ -298,7 +392,23 @@ function G.FUNCS.foobar_load_from_slot (e)
 			card:start_dissolve()
 		end
 	end
-	for _, c in ipairs(deck) do
+	for i = #G.foobar_create_deck_consumables, 1, -1 do
+		local card = G.foobar_create_deck_consumables[i]
+		if card then
+			table.remove(G.foobar_create_deck_consumables, i)
+			card:remove()
+			card:start_dissolve()
+		end
+	end
+	for i = #G.foobar_create_deck_vouchers, 1, -1 do
+		local card = G.foobar_create_deck_vouchers[i]
+		if card then
+			table.remove(G.foobar_create_deck_vouchers, i)
+			card:remove()
+			card:start_dissolve()
+		end
+	end
+	for _, c in ipairs(deck.deck) do
 		G.E_MANAGER:add_event(Event({
 			func = function()
 				local card = SMODS.create_card({set = "Base", area = G.foobar_create_deck_cardarea, rank = c.rank, suit = c.suit, edition = c.edition, enhancement = c.enhancement, seal = c.seal})
@@ -308,6 +418,34 @@ function G.FUNCS.foobar_load_from_slot (e)
 				card:start_dissolve()
 				G.foobar_create_deck_cardarea:emplace(_card)
 				_card.foobar_create_deck_card = true
+				return true
+			end
+		}))
+	end
+	for _, c in ipairs(deck.consumables) do
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				print(c)
+				local card = SMODS.create_card({area = G.foobar_create_deck_consumables_cardarea_offscreen, key = c})
+				local _card = copy_card(card, nil, 0.7)
+				G.foobar_create_deck_consumables[#G.foobar_create_deck_consumables + 1] = _card
+				card:start_dissolve()
+				G.foobar_create_deck_consumables_cardarea_offscreen:emplace(_card)
+				_card.foobar_deck_editor = true
+				return true
+			end
+		}))
+	end
+	for _, c in ipairs(deck.vouchers) do
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				print(c)
+				local card = SMODS.create_card({area = G.foobar_create_deck_vouchers_cardarea_offscreen, key = c})
+				local _card = copy_card(card, nil, 0.7)
+				G.foobar_create_deck_vouchers[#G.foobar_create_deck_vouchers + 1] = _card
+				card:start_dissolve()
+				G.foobar_create_deck_vouchers_cardarea_offscreen:emplace(_card)
+				_card.foobar_deck_editor = true
 				return true
 			end
 		}))
@@ -326,7 +464,238 @@ function G.FUNCS.foobar_load_from_slot (e)
 	}))
 end
 
+function G.FUNCS.foobar_open_consumable_select (e)
+	FooBar.unload_create_ui()
+	G.FUNCS.overlay_menu({definition=G.UIDEF.foobar_consumable_select_ui()})
+end
+
+function G.UIDEF.foobar_consumable_select_ui ()
+	G.foobar_current_prompt_text = ""
+	return {n=G.UIT.ROOT, config = {align = "cm", minw = G.ROOM.T.w*5, minh = G.ROOM.T.h*5,padding = 0.1, r = 0.1, colour = {G.C.GREY[1], G.C.GREY[2], G.C.GREY[3],0.7}}, nodes={
+    {n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
+      {n=G.UIT.C, config={align = "cm", minh = 1,r = 0.2, padding = 0.2, minw = 1, colour = G.C.L_BLACK}, nodes={
+        {n=G.UIT.R, config={align = "cm",padding = 0.2, minw = 7}, nodes={
+					{n = G.UIT.R, config = {align = "cm"}, nodes = {
+						{n = G.UIT.T, config = {text = "Create Consumable", scale = 1, colour = G.C.UI.TEXT_LIGHT}}
+					}},
+					{n = G.UIT.R, config = {align = "cm"}, nodes = {
+						create_text_input{extended_corpus = true, space_key = true, id = "consumable_select_input", ref_table = G, ref_value = "foobar_current_prompt_text"}
+					}},
+					{n = G.UIT.R, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, shadow = true, button = "foobar_consumable_select_input"}, nodes = {
+						{n = G.UIT.T, config = {text = "Create!", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+					}}
+        }},
+        {n=G.UIT.R, config={id = 'overlay_menu_back_button', align = "cm", minw = 2.5, padding =0.1, r = 0.1, hover = true, colour = G.C.ORANGE, button = "foobar_open_edit_deck", shadow = true, focus_args = {nav = 'wide', button = 'b'}}, nodes={
+          {n=G.UIT.R, config={align = "cm", padding = 0, no_fill = true}, nodes={
+            {n=G.UIT.T, config={text = localize('b_back'), scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true, func = 'set_button_pip', focus_args = {button = 'b'}}}
+          }}
+        }}
+      }}
+    }}
+  }}
+end
+
+function G.FUNCS.foobar_consumable_select_input (e)
+	local E = G.OVERLAY_MENU:get_UIE_by_ID("consumable_select_input")
+	if E then
+		local key = "c_" .. string.gsub(G.foobar_current_prompt_text, " ", "_")
+		print(key)
+		local item = G.P_CENTERS[key]
+		if item then
+			local card = SMODS.create_card{
+				key = key,
+				area = G.foobar_create_deck_consumables_cardarea_offscreen
+			}
+			local _card = copy_card(card, nil, 0.7)
+			card:start_dissolve()
+			G.foobar_create_deck_consumables[#G.foobar_create_deck_consumables+1] = _card
+			G.foobar_create_deck_consumables_cardarea_offscreen:emplace(card)
+			_card.foobar_deck_editor = true
+			G.FUNCS.foobar_open_edit_deck(e)
+			return true
+		else
+			print("no item")
+		end
+	else
+		print("no element")
+	end
+end
+
+function G.FUNCS.foobar_open_voucher_select (e)
+	FooBar.unload_create_ui()
+	G.FUNCS.overlay_menu({definition=G.UIDEF.foobar_voucher_select_ui()})
+end
+
+function G.UIDEF.foobar_voucher_select_ui ()
+	G.foobar_current_prompt_text_voucher = ""
+	return {n=G.UIT.ROOT, config = {align = "cm", minw = G.ROOM.T.w*5, minh = G.ROOM.T.h*5,padding = 0.1, r = 0.1, colour = {G.C.GREY[1], G.C.GREY[2], G.C.GREY[3],0.7}}, nodes={
+    {n=G.UIT.R, config={align = "cm", minh = 1,r = 0.3, padding = 0.07, minw = 1, colour = G.C.JOKER_GREY, emboss = 0.1}, nodes={
+      {n=G.UIT.C, config={align = "cm", minh = 1,r = 0.2, padding = 0.2, minw = 1, colour = G.C.L_BLACK}, nodes={
+        {n=G.UIT.R, config={align = "cm",padding = 0.2, minw = 7}, nodes={
+					{n = G.UIT.R, config = {align = "cm"}, nodes = {
+						{n = G.UIT.T, config = {text = "Create Voucher", scale = 1, colour = G.C.UI.TEXT_LIGHT}}
+					}},
+					{n = G.UIT.R, config = {align = "cm"}, nodes = {
+						create_text_input{extended_corpus = true, space_key = true, id = "voucher_select_input", ref_table = G, ref_value = "foobar_current_prompt_text_voucher"}
+					}},
+					{n = G.UIT.R, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, shadow = true, button = "foobar_voucher_select_input"}, nodes = {
+						{n = G.UIT.T, config = {text = "Create!", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
+					}}
+        }},
+        {n=G.UIT.R, config={id = 'overlay_menu_back_button', align = "cm", minw = 2.5, padding =0.1, r = 0.1, hover = true, colour = G.C.ORANGE, button = "foobar_open_edit_deck", shadow = true, focus_args = {nav = 'wide', button = 'b'}}, nodes={
+          {n=G.UIT.R, config={align = "cm", padding = 0, no_fill = true}, nodes={
+            {n=G.UIT.T, config={text = localize('b_back'), scale = 0.5, colour = G.C.UI.TEXT_LIGHT, shadow = true, func = 'set_button_pip', focus_args = {button = 'b'}}}
+          }}
+        }}
+      }}
+    }}
+  }}
+end
+
+function G.FUNCS.foobar_voucher_select_input (e)
+	local E = G.OVERLAY_MENU:get_UIE_by_ID("voucher_select_input")
+	if E then
+		local key = "v_" .. string.gsub(G.foobar_current_prompt_text_voucher, " ", "_")
+		print(key)
+		local item = G.P_CENTERS[key]
+		if item then
+			local card = SMODS.create_card{
+				key = key,
+				area = G.foobar_create_deck_vouchers_cardarea_offscreen
+			}
+			local _card = copy_card(card, nil, 0.7)
+			card:start_dissolve()
+			G.foobar_create_deck_vouchers[#G.foobar_create_deck_vouchers+1] = _card
+			G.foobar_create_deck_vouchers_cardarea_offscreen:emplace(card)
+			_card.foobar_deck_editor = true
+			G.FUNCS.foobar_open_edit_deck(e)
+			return true
+		else
+			print("no item")
+		end
+	else
+		print("no element")
+	end
+end
+
+local can_use_consumeable = G.FUNCS.can_use_consumeable
+function G.FUNCS.can_use_consumeable (e)
+	if e.config.ref_table.foobar_deck_editor then
+		e.UIBox.states.visible = false
+		e.config.colour = G.C.UI.BACKGROUND_INACTIVE
+		e.config.button = nil
+	else
+		e.UIBox.states.visible = true
+		return can_use_consumeable(e)
+	end
+end
+
 function G.UIDEF.foobar_edit_deck_tab ()
+	
+	G.foobar_create_deck_consumables = G.foobar_create_deck_consumables or {}
+	if not G.foobar_create_deck_consumables_cardarea then
+		G.foobar_create_deck_consumables_cardarea = CardArea(0, 0, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 1,
+			card_limit = 3,
+		})
+	end
+	if not G.foobar_create_deck_consumables_cardarea_offscreen then
+		G.foobar_create_deck_consumables_cardarea_offscreen = CardArea(-5, -5, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 0
+		})
+		G.foobar_create_deck_consumables_cardarea_offscreen.foobar_cardarea = true
+		if G.foobar_create_deck_memory_consumables then
+			G.foobar_create_deck_consumables_cardarea_offscreen.cards = {}
+			for _, c in ipairs(G.foobar_create_deck_memory_consumables) do
+				local card = SMODS.create_card({area = G.foobar_create_deck_consumables_cardarea_offscreen, key = c})
+				local _card = copy_card(card, nil, 0.7)
+				G.foobar_create_deck_consumables[#G.foobar_create_deck_consumables + 1] = _card
+				card:start_dissolve()
+				G.foobar_create_deck_consumables_cardarea_offscreen:emplace(_card)
+				_card.foobar_deck_editor = true
+			end
+		end
+	end
+	G.foobar_create_deck_consumables_cardarea_offscreen.added = {}
+	for _, card in ipairs(G.foobar_create_deck_consumables_cardarea_offscreen.cards) do
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				if not card.REMOVED then
+					local __card = copy_card(card, nil, 0.7)
+					local i = 0
+					for _i, _card in ipairs(G.foobar_create_deck_consumables) do
+						if _card == card then
+							i = _i
+							break
+						end
+					end
+					print("2")
+					G.foobar_create_deck_consumables_cardarea_offscreen.added[i] = true
+					G.foobar_create_deck_consumables_cardarea:emplace(__card)
+				end
+				return true
+			end
+		}))
+	end
+
+	G.foobar_create_deck_vouchers = G.foobar_create_deck_vouchers or {}
+	if not G.foobar_create_deck_vouchers_cardarea then
+		G.foobar_create_deck_vouchers_cardarea = CardArea(0, 0, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 1,
+			card_limit = 3,
+		})
+	end
+	if not G.foobar_create_deck_vouchers_cardarea_offscreen then
+		G.foobar_create_deck_vouchers_cardarea_offscreen = CardArea(-5, -5, G.CARD_W * 3 * 0.7, G.CARD_H * 0.7, {
+			type="hand",
+			bg_colour = G.C.UI.TRANSPARENT_DARK,
+			no_card_count = true,
+			highlight_limit = 0
+		})
+		G.foobar_create_deck_vouchers_cardarea_offscreen.foobar_cardarea = true
+		if G.foobar_create_deck_memory_vouchers then
+			G.foobar_create_deck_vouchers_cardarea_offscreen.cards = {}
+			for _, c in ipairs(G.foobar_create_deck_memory_vouchers) do
+				local card = SMODS.create_card({area = G.foobar_create_deck_vouchers_cardarea_offscreen, key = c})
+				local _card = copy_card(card, nil, 0.7)
+				G.foobar_create_deck_vouchers[#G.foobar_create_deck_vouchers + 1] = _card
+				card:start_dissolve()
+				G.foobar_create_deck_vouchers_cardarea_offscreen:emplace(_card)
+				_card.foobar_deck_editor = true
+			end
+		end
+	end
+	G.foobar_create_deck_vouchers_cardarea_offscreen.added = {}
+	for _, card in ipairs(G.foobar_create_deck_vouchers_cardarea_offscreen.cards) do
+		G.E_MANAGER:add_event(Event({
+			func = function()
+				if not card.REMOVED then
+					local __card = copy_card(card, nil, 0.7)
+					local i = 0
+					for _i, _card in ipairs(G.foobar_create_deck_vouchers) do
+						if _card == card then
+							i = _i
+							break
+						end
+					end
+					print("4")
+					G.foobar_create_deck_vouchers_cardarea_offscreen.added[i] = true
+					G.foobar_create_deck_vouchers_cardarea:emplace(__card)
+				end
+				return true
+			end
+		}))
+	end
+
 	G.foobar_create_deck_add_card = G.foobar_create_deck_add_card or {}
 	G.foobar_create_deck_add_card.rank = G.foobar_create_deck_add_card.rank or "10"
 	G.foobar_create_deck_add_card.suit = G.foobar_create_deck_add_card.suit or "Spades"
@@ -338,8 +707,38 @@ function G.UIDEF.foobar_edit_deck_tab ()
 	for _, suit in ipairs(SMODS.Suit.obj_buffer) do
 		suit_options[#suit_options+1] = suit
 	end
-	G.foobar_create_deck_consumables_cardarea.cards = G.foobar_create_deck_consumables_cardarea.cards or {}
-	G.foobar_create_deck_vouchers_cardarea.cards = G.foobar_create_deck_vouchers_cardarea.cards or {}
+	if not G.foobar_create_deck_consumables_cardarea.cards then
+		G.foobar_create_deck_consumables_cardarea.cards = {}
+		for i, card in ipairs(G.foobar_create_deck_consumables) do
+			G.E_MANAGER:add_event(Event({
+				func = function ()
+					if not card.REMOVED then
+						if not G.foobar_create_deck_consumables_cardarea_offscreen.added[i] then
+							print(1)
+							G.foobar_create_deck_consumables_cardarea:emplace(copy_card(card, nil, 0.7))
+						end
+					end
+					return true
+				end
+			}))
+		end
+	end
+	if not G.foobar_create_deck_vouchers_cardarea.cards then
+		G.foobar_create_deck_vouchers_cardarea.cards = {}
+		for i, card in ipairs(G.foobar_create_deck_vouchers) do
+			G.E_MANAGER:add_event(Event({
+				func = function ()
+					if not card.REMOVED then
+						if not G.foobar_create_deck_vouchers_cardarea_offscreen.added[i] then
+							print(3)
+							G.foobar_create_deck_vouchers_cardarea:emplace(copy_card(card, nil, 0.7))
+						end
+					end
+					return true
+				end
+			}))
+		end
+	end
 	return {n = G.UIT.ROOT, config = {align = "cm", minw = 3, padding = 0.1, r = 0.1, colour = G.C.UI.TRANSPARENT_DARK}, nodes = {
     {n=G.UIT.C, config = {align = "ct"}, nodes = {
 			{n = G.UIT.R, config = {align = "cm"}, nodes = {
@@ -461,7 +860,7 @@ function G.UIDEF.foobar_edit_deck_tab ()
 				}},
 			}},
 			{n = G.UIT.R, config = {align = "cm"}, nodes = {
-				{n = G.UIT.C, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, button = "foobar_open_consumable_select", shadow = true}, nodes = {
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, button = "foobar_open_voucher_select", shadow = true}, nodes = {
 					{n = G.UIT.T, config = {text = "Add Voucher", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
 				}},
 			}},
@@ -471,7 +870,7 @@ function G.UIDEF.foobar_edit_deck_tab ()
 				}},
 			}},
 			{n = G.UIT.R, config = {align = "cm"}, nodes = {
-				{n = G.UIT.C, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, button = "foobar_delete_consumable", shadow = true}, nodes = {
+				{n = G.UIT.C, config = {align = "cm", colour = G.C.RED, padding = 0.1, r = 0.1, button = "foobar_delete_voucher", shadow = true}, nodes = {
 					{n = G.UIT.T, config = {text = "Remove Voucher", scale = 0.5, colour = G.C.UI.TEXT_LIGHT}}
 				}}
 			}},
@@ -557,6 +956,7 @@ function G.FUNCS.foobar_destroy_card (e)
 end
 
 function G.UIDEF.foobar_edit_card_tab ()
+
 	G.foobar_create_deck_selected_card_cardarea.cards = {}
 	if G.foobar_create_deck_selected_card then
 		G.foobar_create_deck_selected_card_cardarea:emplace(copy_card(G.foobar_create_deck_selected_card))
@@ -667,14 +1067,7 @@ function G.UIDEF.foobar_edit_card_tab ()
 end
 
 function G.FUNCS.foobar_leave_deck_editor (e)
-	if G.foobar_create_deck then
-		for _, card in ipairs(G.foobar_create_deck) do
-			if card and card.area then
-				card.area:remove_card(card)
-				G.foobar_create_deck_cardarea:emplace(card, nil, false)
-			end
-		end
-	end
+	FooBar.unload_create_ui()
 	return G.FUNCS.setup_run(e)
 end
 
@@ -732,6 +1125,11 @@ function FooBar.create_deck_ui()
 	G.foobar_create_deck_suit_cardareas = {}
 	local deck_tables = {}
 	remove_nils(G.foobar_create_deck)
+	for i = #G.foobar_create_deck, 1, -1 do
+		if G.foobar_create_deck[i].REMOVED then
+			table.remove(G.foobar_create_deck, i)
+		end
+	end
 	local view_deck_unplayed_only = false
 	table.sort(G.foobar_create_deck, function(a, b) return a:get_nominal('suit') > b:get_nominal('suit') end)
 	local SUITS = {}
