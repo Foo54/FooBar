@@ -8,5 +8,5 @@ balatro mod made by foo54
 - 2 New Spectrals!
 - 1 New Consumable Type
   - 20 Voicebanks, with 4 booster packs and a legendary spectral!
-- 2 New Decks and their sleeves!
+- 3 New Decks and 2 sleeves!
 - MINIGAMES (only 1 right now)
