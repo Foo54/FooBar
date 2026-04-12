@@ -1493,4 +1493,43 @@ SMODS.Joker{
 	end
 }
 
+--- twitter
+SMODS.Joker{
+	atlas = "jokers",
+	pos = {x = 7, y = 2},
+	key = "twitter",
+	config = {
+		extra = {
+			chips = 0,
+			scale = 5
+		}
+	},
+	loc_vars = function(self, info_queue, card)
+		return {vars = {card.ability.extra.scale, card.ability.extra.chips}, key = "j_foobar_" .. pseudorandom_element({"twitter", "x"}, "twitter_display")}
+	end,
+	calculate = function(self, card, context)
+		if context.before and not context.blueprint then
+			for _, _card in ipairs(context.full_hand) do
+				if _card.debuff then
+					SMODS.scale_card(card, {
+						ref_table = card.ability.extra,
+						ref_value = "chips",
+						scalar_value = "scale"
+					})
+				end
+			end
+		end
+		if context.hand_drawn then
+			local _card = pseudorandom_element(G.hand.cards, "twitter_debuff")
+			if _card then
+				_card:set_debuff(true)
+			end
+		end
+		if context.joker_main then
+			return {
+				chips = card.ability.extra.chips
+			}
+		end
+	end
+}
 

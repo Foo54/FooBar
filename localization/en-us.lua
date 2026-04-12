@@ -426,6 +426,34 @@ return {
 						"{C:attention}#2#{} and {C:attention}#3#"
 					}
 				}
+			},
+			j_foobar_twitter = {
+				name = "Twitter",
+				text = {
+					{
+						"Gains {C:chips}#1#{} chips",
+						"per {C:red}debuffed{} card played",
+						"{C:inactive}[Currently {C:chips}#2#{C:inactive} Chips]"
+					},
+					{
+						"After hand is drawn",
+						"debuff a random card"
+					}
+				}
+			},
+			j_foobar_x = {
+				name = "X",
+				text = {
+					{
+						"Gains {C:chips}#1#{} chips",
+						"per {C:red}debuffed{} card played",
+						"{C:inactive}[Currently {C:chips}#2#{C:inactive} Chips]"
+					},
+					{
+						"After hand is drawn",
+						"debuff a random card"
+					}
+				}
 			}
 		},
 		Enhanced = {
