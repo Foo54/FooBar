@@ -1249,35 +1249,30 @@ function FooBar.create_deck_ui()
 		if SUITS[suit_map[j]][1] then num_suits = num_suits + 1 end
 	end
 
-	local visible_suit = {}
-	for j = 1, #suit_map do
-		if SUITS[suit_map[j]][1] then
-			table.insert(visible_suit, suit_map[j])
-		end
-	end
+	local visible_suit = suit_map
 
 	for j = 1, #visible_suit do
 		if (j >= 1 and j <= 4) or num_suits <= 4 then
+			local view_deck = CardArea(
+				0, 0,
+				4.5 * G.CARD_W,
+				(0.6) * G.CARD_H,
+				{
+					card_limit = #SUITS[visible_suit[j]] or 1,
+					highlight_limit = 1,
+					type = "hand",
+					card_w = G.CARD_W * 0.5,
+					card_h = G.CARD_H * 0.5,
+					draw_layers = { 'card' },
+					negative_info = 'playing_card',
+					no_card_count = true
+				})
+			G.foobar_create_deck_suit_cardareas[visible_suit[j]] = view_deck
+			table.insert(deck_tables,
+				{n = G.UIT.R, config = {align = "cm", padding = 0}, nodes = {
+					{n = G.UIT.O, config = {object = view_deck}}}}
+			)
 			if SUITS[visible_suit[j]][1] then
-				local view_deck = CardArea(
-					0, 0,
-					4.5 * G.CARD_W,
-					(0.6) * G.CARD_H,
-					{
-						card_limit = #SUITS[visible_suit[j]],
-						highlight_limit = 1,
-						type = "hand",
-						card_w = G.CARD_W * 0.5,
-						card_h = G.CARD_H * 0.5,
-						draw_layers = { 'card' },
-						negative_info = 'playing_card',
-						no_card_count = true
-					})
-				G.foobar_create_deck_suit_cardareas[visible_suit[j]] = view_deck
-				table.insert(deck_tables,
-					{n = G.UIT.R, config = {align = "cm", padding = 0}, nodes = {
-						{n = G.UIT.O, config = {object = view_deck}}}}
-				)
 				G.E_MANAGER:add_event(Event({
 					func = function()
 						for i = 1, #SUITS[visible_suit[j]] do
