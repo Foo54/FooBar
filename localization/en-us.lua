@@ -454,6 +454,234 @@ return {
 						"debuff a random card"
 					}
 				}
+			},
+
+			-- create machines
+			j_foobar_create_belt = {
+				name = "Mechanical Belt",
+				text = {
+					"Unscored cards are",
+					"affected by {C:foobar_create}Create{} cards"
+				}
+			},
+			j_foobar_create_arm = {
+				name = "Mechanical Arm",
+				text = {
+					"Move the first card to",
+					"the back of the line",
+					"after its processed"
+				}
+			},
+			j_foobar_create_press = {
+				name = "Mechanical Press",
+				text = {
+					"Cards gain their rank in {C:mult}mult",
+					"before losing half of it"
+				}
+			},
+			j_foobar_create_press_basin = {
+				name = {"Mechanical Press", "{s:0.8}(In a Basin)"},
+				text = {
+					"Cards of the same rank",
+					"are compressed into one card",
+					"after scoring"
+				}
+			},
+			j_foobar_create_handcrank = {
+				name = "Hand Crank",
+				text = {
+					"Force trigger adjacent",
+					"{C:foobar_create}Create{} cards"
+				}
+			},
+			j_foobar_create_blazeburner = {
+				name = "Blaze Burner",
+				text = {
+					"{C:attention}Double{} values of",
+					"{C:foobar_create}Create{} card",
+					"to the left"
+				}
+			},
+			j_foobar_create_blazeburner_superheated = {
+				name = {"Blaze Burner", "{s:0.8}(Superheated)"},
+				text = {
+					"{C:attention}Triple{} values of",
+					"{C:foobar_create}Create{} card",
+					"to the left"
+				}
+			},
+			j_foobar_create_mixer = {
+				name = "Mechanical Mixer",
+				text = {
+					"{C:red}Remove{} a random modification",
+					"to give it {X:mult,C:white}X#1#{} Xmult"
+				}
+			},
+			j_foobar_create_mixer_basin = {
+				name = {"Mechanical Press", "{s:0.8}(In a Basin)"},
+				text = {
+					"{C:attention}Mix{} the {C:attention}first{} card",
+					"of each {C:attention}rank{}",
+					"into a {C:attention}new{} card"
+				}
+			},
+			j_foobar_create_fan = {
+				name = "Encased Fan",
+				text = {
+					"Increase {C:attention}card's",
+					"rank by {C:attention}#1#"
+				}
+			},
+			j_foobar_create_deployer = {
+				name = "Deployer",
+				text = {
+					"{C:green}#1# in #2#{} chance to",
+					"copy the last used",
+					"{C:Tarot}Tarot{} card"
+				}
+			},
+			j_foobar_create_saw = { -- requires aikoshen
+				name = "Mechanical Saw",
+				text = {
+					"Splits card into",
+					"Their rank and suit"
+				}
+			},
+			j_foobar_create_harvester = {
+				name = "Mechanical Harvester",
+				text = {
+					"Face cards are cut",
+					"down into #1#'s",
+					"Earn {C:money}$#2#{} per card",
+					"harvested"
+				}
+			},
+			j_foobar_create_plough = {
+				name = "Mechanical Plough",
+				text = {
+					"Destroy played #1#'s"
+				}
+			},
+			j_foobar_create_drill = {
+				name = "Mechanical Drill",
+				text = {
+					"Decrease cards rank by #1#"
+				}
+			},
+			j_foobar_create_frogport = {
+				name = "Frogport",
+				text = {
+					"Draw and score",
+					"top card of deck",
+					"If under #1# cards",
+					"are played"
+				}
+			},
+			j_foobar_create_vault = {
+				name = "Item Vault",
+				text = {
+					"Store {X:mult,C:white}Xmult{} from cards",
+					"until after cards are scored",
+				}
+			},
+			j_foobar_create_millstone = {
+				name = "Millstone",
+				text = {
+					"Cards gain their rank in chips",
+					"and then decrease their rank",
+					"by #1#"
+				}
+			},
+			j_foobar_create_crushingwheels = {
+				name = "Crushing Wheels",
+				text = {
+					"Played cards are destroyed",
+					"after scoring",
+					"{C:green}#1# in #2#{} chance",
+					"to create a copy",
+					"of destroyed cards",
+					"with x#3# values"
+				}
+			},
+			j_foobar_create_crafter = {
+				name = "Mechanical Crafter",
+				text = {
+					{
+						"Play the cards",
+						"listed below to",
+						"destroy them and",
+						"create a spectral card"
+					},
+					{
+						"#1#",
+						"#2#",
+						"#3#",
+						"#4#",
+						"#5#"
+					}
+				}
+			},
+
+			--- Fan - cards gain x0.1 chips
+			--- Mixer - cards also gain +20 chips
+			--- Mixer + Basin - x1.5 stats after mixing
+			--- Press + Basin - create an copy of the new card
+			--- Blazeburner - half stats instead
+			j_foobar_create_waterbucket = {
+				name = "Water Bucket",
+				text = {
+					"Adds an effect to the",
+					"{C:foobar_create}Create{} card",
+					"to the left"
+				}
+			},
+			--- Fan - 1 in 2 chance to gain x0.2 mult, otherwise destroy card
+			--- Mixer - cards also gain +2 mult
+			--- Mixer + Basin - upgrade cards edition
+			--- Press + Basin - x1.5 stats after compressing
+			--- Blazeburner - superheat
+			j_foobar_create_lavabucket = {
+				name = "Lava Bucket",
+				text = {
+					"Adds an effect to the",
+					"{C:foobar_create}Create{} card",
+					"to the left"
+				}
+			},
+			--- Fan - cards gain +5 mult
+			--- Mixer - cards gain +2 mult when held in hand
+			--- Mixer + Basin - cards gain +4 mult when held in hand
+			--- Press + Basin - x1.1 stats after compressing
+			--- Blazeburner - x2.2 values
+			j_foobar_create_fire = {
+				name = "Fire",
+				text = {
+					"Adds an effect to the",
+					"{C:foobar_create}Create{} card",
+					"to the left"
+				}
+			},
+			--- Fan - cards gain a random modification
+			--- Mixer - give a random enhancement back
+			--- Mixer + Basin - Rank will be the highest rank not mixed, and gain mult based on this rank
+			--- Press + Basin - Randomize rank and suit, and gain mult based on this rank
+			--- Blazeburner - swap changes to chips and mult
+			j_foobar_create_soulfire = {
+				name = "Soulfire",
+				text = {
+					"Adds an effect to the",
+					"{C:foobar_create}Create{} card",
+					"to the left"
+				}
+			},
+
+			j_foobar_create_basin = {
+				name = "Basin",
+				text = {
+					"Changes the effect of the",
+					"{C:foobar_create}Create{} card",
+					"to the left"
+				}
 			}
 		},
 		Enhanced = {
