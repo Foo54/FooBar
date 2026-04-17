@@ -1,1 +1,1 @@
-return "FooBar_VERSION_1.1.0-260416a
+return "FooBar_VERSION_1.1.0-260417a
