@@ -1,0 +1,15 @@
+[manifest]
+version = "1.0.0"
+dump_lua = true
+priority = 0
+
+# stop crash when editing the deck with cryptid
+[[patches]]
+[patches.pattern]
+target = 'cardarea.lua'
+pattern = '''self.config.temp_limit = math.min(self.config.card_limit, #G.playing_cards)'''
+position = 'at'
+payload = '''self.config.temp_limit = math.min(self.config.card_limit, #(G.playing_cards or self.cards))'''
+match_indent = true
+
+

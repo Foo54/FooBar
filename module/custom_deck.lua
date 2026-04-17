@@ -1267,6 +1267,7 @@ function FooBar.create_deck_ui()
 					negative_info = 'playing_card',
 					no_card_count = true
 				})
+			view_deck.playing_cards = view_deck.playing_cards or {}
 			G.foobar_create_deck_suit_cardareas[visible_suit[j]] = view_deck
 			table.insert(deck_tables,
 				{n = G.UIT.R, config = {align = "cm", padding = 0}, nodes = {
@@ -1510,4 +1511,3 @@ function FooBar.create_deck_ui()
 			}}}}
 	return t
 end
-
