@@ -786,7 +786,8 @@ return {
 				text = {
 					"Spend points to",
 					"customize your deck",
-					"before starting a run"
+					"before starting a run",
+					" {element:1} "
 				}
 			}
 		},

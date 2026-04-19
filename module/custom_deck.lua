@@ -22,12 +22,12 @@ SMODS.Back({
 	atlas = "decks",
 	pos = {x = 0.5, y = 0},
 	loc_vars = function(self, info_queue, card)
-		return {main_end = {
-			{n = G.UIT.R, config = {align = "cm", maxw = 1}, nodes = {
+		return {vars = {
+			elements = {
 				{n = G.UIT.R, config = {align = "cm", padding=0.1, r=0.2, colour = G.C.BLUE, button = "foobar_open_edit_deck", func = "foobar_open_edit_deck_allow", shadow=true}, nodes = {
 					{n = G.UIT.T, config = {text = "Edit Deck", scale = 0.3, colour = G.C.UI.TEXT_LIGHT}}
 				}}
-			}}
+			}
 		}}
 	end,
 	initial_deck = {Ranks = {} },
