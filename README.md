@@ -18,3 +18,6 @@ balatro mod made by foo54
 - Cartomancer
 - Amulet
 - JokerDisplay
+
+# Problems?
+Please report any issues you encounter in the Issues tab, I check them daily
